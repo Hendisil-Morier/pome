@@ -1,5 +1,6 @@
-#define TB_IMPL
-#include "termbox2.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #include "error.h"
 
 typedef struct
@@ -129,8 +130,8 @@ typedef struct
   } direction;
 } Direction;
 
-#define RIGHT ((Direction){DIR_RIGHT})
-#define LEFT ((Direction){DIR_LEFT})
+static constexpr Direction RIGHT = {.direction = DIR_RIGHT};
+static constexpr Direction LEFT = {.direction = DIR_LEFT};
 
 Status move_gap(gap_buffer* buffer, size_t distance, Direction dir)
 {
@@ -141,8 +142,7 @@ Status move_gap(gap_buffer* buffer, size_t distance, Direction dir)
         (buffer->capacity - buffer->gap_end) : buffer->gap_start;
 
   if (distance > safe_distance) distance = safe_distance;
-  if (distance > buffer->gap_end - buffer->gap_start)
-    expand_gap_buffer(buffer, buffer->capacity + distance);
+
   char* buf = buffer->buf;
 
   char* left_dest_address = buf + (buffer->gap_end - distance);
@@ -163,4 +163,38 @@ Status move_gap(gap_buffer* buffer, size_t distance, Direction dir)
   }
 
   return SUCCESS;
+}
+
+Status move_gap_to(gap_buffer* buffer, size_t abs_pos)
+{
+  if (buffer == nullptr) return FAILURE;
+
+  const size_t safe_pos = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  if (abs_pos > safe_pos) abs_pos = safe_pos;
+
+  Status st = FAILURE;
+  if (abs_pos > buffer->gap_start)
+    st = move_gap(buffer, abs_pos - buffer->gap_start, RIGHT);
+
+  else if (abs_pos < buffer->gap_start)
+    st = move_gap(buffer, buffer->gap_start - abs_pos, LEFT);
+
+  else
+    st = SUCCESS;
+
+  return st;
+}
+
+char gb_char_at(gap_buffer *buffer, size_t abs_pos)
+{
+  if (buffer == nullptr) return 0;
+
+  const size_t safe_pos = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  if (abs_pos > safe_pos)
+    return 0;
+
+  if (abs_pos >= buffer->gap_start)
+    abs_pos += buffer->gap_end - buffer->gap_start;
+
+  return buffer->buf[abs_pos];
 }

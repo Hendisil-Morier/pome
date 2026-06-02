@@ -13,8 +13,8 @@
   #define FAILED(s) ((s).state == FAILURE_E)
   #define SUCCEEDED(s) ((s).state == SUCCESS_E)
 
-  #define SUCCESS ((Status){SUCCESS_E})
-  #define FAILURE ((Status){FAILURE_E})
-  #define NOT_EXECUTE ((Status){NOT_EXECUTE_E})
+  static constexpr Status FAILURE = {.state = FAILURE_E};
+  static constexpr Status SUCCESS = {.state = SUCCESS_E};
+  static constexpr Status NOT_EXECUTE = {.state = NOT_EXECUTE_E};
 
 #endif
