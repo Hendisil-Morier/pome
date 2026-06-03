@@ -2,29 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
-
-typedef struct
-{
-  size_t x, y;
-} Position;
-
-typedef struct
-{
-  size_t width, height;
-} terminal_state;
-
-typedef struct
-{
-  Position pos;
-} cursor_state;
-
-typedef struct
-{
-  size_t capacity;
-  size_t gap_start;
-  size_t gap_end;
-  char *buf;
-} gap_buffer;
+#include "editor_datatype.h"
+#include "editor.h"
 
 constexpr size_t GAP_BUFFER_SIZE = 32;
 
@@ -46,7 +25,6 @@ gap_buffer* init_gap_buffer(void)
 void free_gb(gap_buffer* buffer)
 {
   free(buffer->buf);
-  free(buffer);
 }
 
 Status expand_gap_buffer(gap_buffer* buffer, size_t new_cap)
@@ -121,19 +99,8 @@ Status delete_after_gap_buffer(gap_buffer* buffer)
   return SUCCESS;
 }
 
-typedef struct
-{
-  enum
-  {
-    DIR_RIGHT,
-    DIR_LEFT,
-  } direction;
-} Direction;
 
-static constexpr Direction RIGHT = {.direction = DIR_RIGHT};
-static constexpr Direction LEFT = {.direction = DIR_LEFT};
-
-Status move_gap(gap_buffer* buffer, size_t distance, Direction dir)
+Status move_gap_horizontal(gap_buffer* buffer, size_t distance, Direction dir)
 {
   if (buffer == nullptr) return FAILURE;
   if (distance == 0) return SUCCESS;
@@ -160,6 +127,7 @@ Status move_gap(gap_buffer* buffer, size_t distance, Direction dir)
       buffer->gap_start += distance;
       buffer->gap_end += distance;
       break;
+    default: return FAILURE;
   }
 
   return SUCCESS;
@@ -174,10 +142,10 @@ Status move_gap_to(gap_buffer* buffer, size_t abs_pos)
 
   Status st = FAILURE;
   if (abs_pos > buffer->gap_start)
-    st = move_gap(buffer, abs_pos - buffer->gap_start, RIGHT);
+    st = move_gap_horizontal(buffer, abs_pos - buffer->gap_start, RIGHT);
 
   else if (abs_pos < buffer->gap_start)
-    st = move_gap(buffer, buffer->gap_start - abs_pos, LEFT);
+    st = move_gap_horizontal(buffer, buffer->gap_start - abs_pos, LEFT);
 
   else
     st = SUCCESS;
@@ -197,4 +165,90 @@ char gb_char_at(gap_buffer *buffer, size_t abs_pos)
     abs_pos += buffer->gap_end - buffer->gap_start;
 
   return buffer->buf[abs_pos];
+}
+
+size_t get_line_start(gap_buffer *buffer, size_t target_line)
+{
+  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t lines = 0;
+  for (size_t i = 0; i < logic_text_len; i++)
+  {
+    if (lines == target_line) return i;
+    if (gb_char_at(buffer, i) == '\n') lines++;
+  }
+  return logic_text_len;
+}
+
+size_t get_line_length(gap_buffer* buffer, size_t target_line)
+{
+  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t line_start = get_line_start(buffer, target_line);
+  size_t i = 0;
+
+  for (;line_start + i < logic_text_len; i++)
+    if (gb_char_at(buffer, line_start + i) == '\n') break;
+
+  return i;
+}
+
+size_t get_total_lines(gap_buffer* buffer)
+{
+  if (buffer == nullptr) return 0;
+
+  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t lines = 1;
+  for (size_t i = 0; i < logic_text_len; i++)
+  {
+    char c = gb_char_at(buffer, i);
+    if (c == '\n') lines++;
+  }
+
+  return lines;
+}
+
+size_t max(size_t a, size_t b)
+{
+  return (a < b)? a : b;
+}
+
+Status move_gap_vertical(gap_buffer *buffer, size_t target_line)
+{
+  if (buffer == nullptr) return FAILURE;
+  /* size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end); */
+
+  Position cur_pos = get_cursor_pos(buffer);
+  size_t line_length = get_line_length(buffer, target_line);
+  size_t line_start = get_line_start(buffer, target_line);
+  size_t target_x = max(cur_pos.x, line_length);
+
+  Status st = FAILURE;
+  st = move_gap_to(buffer, line_start + target_x);
+
+  return st;
+}
+
+Status move_gap(gap_buffer* buffer, size_t times, Direction direction)
+{
+  if (buffer == nullptr) return FAILURE;
+  if (times == 0) return SUCCESS;
+
+  Position cur_pos = get_cursor_pos(buffer);
+
+  switch (direction.direction)
+  {
+    case DIR_LEFT:
+      return move_gap_horizontal(buffer, times, LEFT);
+    case DIR_RIGHT:
+      return move_gap_horizontal(buffer, times,RIGHT);
+    case DIR_UP:
+      if (cur_pos.y < times) times = cur_pos.y;
+      return move_gap_vertical(buffer,cur_pos.y - times);
+    case DIR_DOWN:
+      size_t total = get_total_lines(buffer);
+      size_t target = cur_pos.y + times;
+      if (target > total) target = total;
+      return move_gap_vertical(buffer,target);
+    default:
+      return FAILURE;
+  }
 }
