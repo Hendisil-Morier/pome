@@ -1,2 +1,2 @@
 pome:
-	gcc src/* -o build/pome -Wall -Wextra -pedantic -std=c23 -Iinclude
+	gcc src/* -o build/pome -Wextra -Wall -pedantic -std=c23 -Iinclude

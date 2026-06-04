@@ -43,6 +43,7 @@ typedef struct
 
 typedef struct
 {
+  const char* filename;
   gap_buffer* buffer;
   terminal_state term_stat;
   size_t row_offset;
