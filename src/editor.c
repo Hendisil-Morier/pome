@@ -1,7 +1,6 @@
 #include "editor_datatype.h"
 #include "gap_buffer.h"
 #include "termbox2.h"
-#include "file_handling.h"
 
 Position get_cursor_pos(gap_buffer *buffer)
 {
@@ -27,18 +26,55 @@ Position get_cursor_pos(gap_buffer *buffer)
   return cur_pos;
 }
 
+void set_mode(Editor* editor, const char* mode_name, bool save)
+{
+  if (editor == nullptr) return;
+
+  free(editor->pre_mode);
+
+  if (save == true)
+    editor->pre_mode = editor->current_mode;
+  else
+  {
+    free(editor->current_mode);
+    editor->pre_mode = nullptr;
+  }
+
+  editor->current_mode = strdup(mode_name);
+}
+
+bool call_keymap(struct tb_event* ev, Editor* editor)
+{
+  if (ev == nullptr || editor == nullptr)
+    return false;
+
+  lua_State *lua = editor->lua;
+
+  lua_getglobal(lua, "modes");
+  lua_getfield(lua, -1, editor->current_mode);
+
+  lua_pushinteger(lua, ev->key);
+  lua_gettable(lua, -2);
+
+  if (lua_isfunction(lua, -1) == false)
+  {
+    lua_pop(lua, 4);
+    return false;
+  }
+
+  lua_pcall(lua, 0, 0, 0);
+  lua_pop(lua, 2);
+  lua_pop(lua, 1);
+
+  return true;
+}
+
 void process_key(struct tb_event *ev, Editor* editor)
 {
   if (ev == nullptr || editor == nullptr)
     return;
 
   lua_State *lua = editor->lua;
-
-  if (ev->ch)
-  {
-    insert_gap_buffer(editor->buffer, (char)ev->ch);
-    return;
-  }
 
   lua_getglobal(lua, "keymap");
   lua_pushinteger(lua, ev->key);

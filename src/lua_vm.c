@@ -1,3 +1,4 @@
+#include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 #include "editor_datatype.h"
@@ -90,8 +91,69 @@ int lua_move_cursor(lua_State* lua)
 
 int lua_quit_editor(lua_State* lua)
 {
+  if (lua == nullptr) return 0;
   Editor *editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
   quit_editor(editor);
+  return 0;
+}
+
+int lua_insert_char(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  int ch = luaL_checkinteger (lua, 1);
+  //ascii
+  if (ch < 0 || ch > 127) return 0;
+
+  insert_gap_buffer(editor->buffer, (char)ch);
+
+  return 0;
+}
+
+int lua_insert_newline(lua_State *lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  int times = luaL_checkinteger(lua, 1);
+  if (times < 0) return 0;
+
+  for (size_t i = 0; i < (size_t)times; i++)
+    insert_gap_buffer(editor->buffer, '\n');
+
+  return 0;
+}
+
+bool is_minor_mode(lua_State* lua, const char* mode_name)
+{
+  if (lua == nullptr) return false;
+
+  lua_getglobal(lua, "modes");
+  lua_getfield(lua, -1, mode_name);
+  lua_getfield(lua, -1, "minor");
+
+  bool result = lua_toboolean(lua, -1);
+
+  lua_pop(lua, 3);
+  return result;
+}
+
+int lua_set_mode(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  const char* mode_name = luaL_checkstring(lua, 1);
+  bool save = is_minor_mode(lua, mode_name);
+
+  set_mode(editor, mode_name, save);
+
   return 0;
 }
 
@@ -99,6 +161,7 @@ void register_primitives(lua_State *lua)
 {
   lua_register(lua, "move_cursor", lua_move_cursor);
   lua_register(lua, "quit_editor", lua_quit_editor);
+  lua_register(lua, "insert_char", lua_insert_char);
 }
 
 Editor* get_editor(lua_State *lua)

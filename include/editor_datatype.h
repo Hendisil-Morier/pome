@@ -50,6 +50,9 @@ typedef struct
   gap_buffer* buffer;
   terminal_state term_stat;
 
+  const char* current_mode;
+  const char* pre_mode;
+
   size_t row_offset;
   bool running; //gooning
 } Editor;
