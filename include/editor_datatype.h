@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <lua.h>
 
 typedef struct
 {
@@ -44,7 +45,11 @@ typedef struct
 typedef struct
 {
   const char* filename;
+  lua_State *lua;
+
   gap_buffer* buffer;
   terminal_state term_stat;
+
   size_t row_offset;
+  bool running; //gooning
 } Editor;

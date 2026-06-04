@@ -25,6 +25,7 @@ gap_buffer* init_gap_buffer(void)
 void free_gb(gap_buffer* buffer)
 {
   free(buffer->buf);
+  free(buffer);
 }
 
 Status expand_gap_buffer(gap_buffer* buffer, size_t new_cap)
@@ -206,7 +207,7 @@ size_t get_total_lines(gap_buffer* buffer)
   return lines;
 }
 
-size_t max(size_t a, size_t b)
+size_t min(size_t a, size_t b)
 {
   return (a < b)? a : b;
 }
@@ -219,7 +220,7 @@ Status move_gap_vertical(gap_buffer *buffer, size_t target_line)
   Position cur_pos = get_cursor_pos(buffer);
   size_t line_length = get_line_length(buffer, target_line);
   size_t line_start = get_line_start(buffer, target_line);
-  size_t target_x = max(cur_pos.x, line_length);
+  size_t target_x = min(cur_pos.x, line_length);
 
   Status st = FAILURE;
   st = move_gap_to(buffer, line_start + target_x);
@@ -246,7 +247,7 @@ Status move_gap(gap_buffer* buffer, size_t times, Direction direction)
     case DIR_DOWN:
       size_t total = get_total_lines(buffer);
       size_t target = cur_pos.y + times;
-      if (target > total) target = total;
+      if (target >= total) target = total - 1;
       return move_gap_vertical(buffer,target);
     default:
       return FAILURE;

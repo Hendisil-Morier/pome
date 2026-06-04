@@ -41,9 +41,6 @@ void render_char (Editor *editor)
       continue;
     }
 
-    if (screen_y >= editor->row_offset && screen_y < editor->row_offset + screen_rows)
-      tb_set_cell(screen_x, screen_y - editor->row_offset, c, TB_DEFAULT, TB_DEFAULT);
-
     if (c == '\t')
     {
       // advance to the next multiple of 8 (standard tab width)
@@ -57,6 +54,9 @@ void render_char (Editor *editor)
       }
       continue;
     }
+
+    if (screen_y >= editor->row_offset && screen_y < editor->row_offset + screen_rows)
+      tb_set_cell(screen_x, screen_y - editor->row_offset, c, TB_DEFAULT, TB_DEFAULT);
 
     screen_x++;
   }
