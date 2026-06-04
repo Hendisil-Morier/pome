@@ -14,7 +14,7 @@ void init_lua(Editor* editor)
   lua_State *lua = luaL_newstate();
   if (lua == nullptr)
   {
-    fprintf(stderr, "Lua: cannot initialize");
+    fprintf(stderr, "Lua: cannot initialize.\r\n");
     return;
   }
 
@@ -29,7 +29,7 @@ Status lua_load_config(lua_State *lua, const char* filename)
 {
   if (luaL_dofile(lua, filename) != LUA_OK)
   {
-    fprintf(stderr, "Lua error: %s\n", lua_tostring(lua, -1));
+    fprintf(stderr, "Lua load config error: %s\r\n", lua_tostring(lua, -1));
     lua_pop(lua, 1);
     return FAILURE;
   }
@@ -69,7 +69,7 @@ void register_constant(lua_State *lua)
   lua_set_intfield(lua, TB_KEY_DELETE, "delete");
   lua_set_intfield(lua, TB_KEY_ENTER, "enter");
 
-  lua_set_intfield(lua, TB_KEY_CTRL_S, "ctrl_s");
+  lua_set_intfield(lua, TB_KEY_CTRL_R, "ctrl_r");
   lua_set_intfield(lua, TB_KEY_CTRL_Q, "ctrl_q");
 
   lua_setglobal(lua, "key_press");
@@ -157,11 +157,54 @@ int lua_set_mode(lua_State* lua)
   return 0;
 }
 
+int lua_delete_after_cursor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  delete_after_gap_buffer(editor->buffer);
+  return 0;
+}
+
+int lua_delete_before_cursor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  delete_before_gap_buffer(editor->buffer);
+  return 0;
+}
+
+int lua_reload_config(lua_State *lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  const char *filename = luaL_optstring(lua, 1, "init.lua");
+  Status result = lua_load_config(lua, filename);
+
+  lua_pushboolean(lua, SUCCEEDED(result));
+
+  return 1;
+}
+
 void register_primitives(lua_State *lua)
 {
   lua_register(lua, "move_cursor", lua_move_cursor);
   lua_register(lua, "quit_editor", lua_quit_editor);
+
   lua_register(lua, "insert_char", lua_insert_char);
+  lua_register(lua, "set_mode", lua_set_mode);
+
+  lua_register(lua, "insert_newline", lua_insert_newline);
+
+  lua_register(lua, "delete_after_cursor", lua_delete_after_cursor);
+  lua_register(lua, "delete_before_cursor", lua_delete_before_cursor);
+
+  lua_register(lua, "load_config", lua_reload_config);
 }
 
 Editor* get_editor(lua_State *lua)
@@ -170,7 +213,7 @@ Editor* get_editor(lua_State *lua)
   Editor *editor = lua_touserdata(lua, -1);
   if (editor == nullptr)
   {
-    fprintf(stderr, "Sumting go rong.");
+    fprintf(stderr, "Sumting go rong.\r\n");
     return nullptr;
   }
 

@@ -11,5 +11,5 @@ executable('pome',
   sources,
   dependencies: [lua, m],
   include_directories: include_directories('include'),
-  c_args: ['-Wextra', '-Wall', '-pedantic'],
+  c_args: ['-Wextra', '-Wall', '-pedantic', '-g', '-O0'],
   build_by_default: true)
