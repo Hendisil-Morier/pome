@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   register_constant(editor.lua);
 
   //load config
-  lua_load_config(editor.lua, "/home/morier/.config/pome/config.lua");
+  lua_load_config(editor.lua, "config.lua");
 
   load_file(&editor);
   move_gap_to(editor.buffer, 0);

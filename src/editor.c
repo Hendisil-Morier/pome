@@ -34,7 +34,7 @@ void process_key(struct tb_event *ev, Editor* editor)
 
   lua_State *lua = editor->lua;
 
-  if (ev->ch == true)
+  if (ev->ch)
   {
     insert_gap_buffer(editor->buffer, (char)ev->ch);
     return;
