@@ -40,7 +40,15 @@ typedef struct
 typedef struct
 {
   Position pos;
+  size_t anchor;
+  bool selecting;
 } cursor_state;
+
+typedef struct
+{
+  const char* current_mode;
+  const char* pre_mode;
+} mode_info;
 
 typedef struct
 {
@@ -50,8 +58,8 @@ typedef struct
   gap_buffer* buffer;
   terminal_state term_stat;
 
-  const char* current_mode;
-  const char* pre_mode;
+  mode_info modeinfo;
+  cursor_state cursor;
 
   size_t row_offset;
   bool running; //gooning

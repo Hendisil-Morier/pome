@@ -4,8 +4,7 @@
 #include "editor_datatype.h"
 #include "termbox2.h"
 #include "error.h"
-#include "gap_buffer.h"
-#include "editor.h"
+#include "c_to_lua.h"
 
 Editor* get_editor(lua_State *lua);
 
@@ -69,137 +68,47 @@ void register_constant(lua_State *lua)
   lua_set_intfield(lua, TB_KEY_DELETE, "delete");
   lua_set_intfield(lua, TB_KEY_ENTER, "enter");
 
+  lua_set_intfield(lua, TB_KEY_ESC, "esc");
+
   lua_set_intfield(lua, TB_KEY_CTRL_R, "ctrl_r");
   lua_set_intfield(lua, TB_KEY_CTRL_Q, "ctrl_q");
 
+  //printable character
+  //lowercase
+  for (char c = 'a'; c <= 'z'; c++)
+  {
+    char name[2] = {c, '\0'};
+    lua_set_intfield(lua, c, name);
+  }
+
+  // uppercase
+  for (char c = 'A'; c <= 'Z'; c++)
+  {
+    char name[2] = {c, '\0'};
+    lua_set_intfield(lua, c, name);
+  }
+
   lua_setglobal(lua, "key_press");
-}
-
-int lua_move_cursor(lua_State* lua)
-{
-  Editor* editor = get_editor(lua);
-
-  int direction = luaL_checkinteger(lua, 1);
-  int times = luaL_checkinteger(lua, 2);
-
-  Direction dirs[] = {RIGHT, LEFT, UP, DOWN};
-  if (direction < 0 || direction >= 4) return 0;
-
-  move_gap(editor->buffer, (size_t)times, dirs[direction]);
-  return 0;
-}
-
-int lua_quit_editor(lua_State* lua)
-{
-  if (lua == nullptr) return 0;
-  Editor *editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  quit_editor(editor);
-  return 0;
-}
-
-int lua_insert_char(lua_State* lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  int ch = luaL_checkinteger (lua, 1);
-  //ascii
-  if (ch < 0 || ch > 127) return 0;
-
-  insert_gap_buffer(editor->buffer, (char)ch);
-
-  return 0;
-}
-
-int lua_insert_newline(lua_State *lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  int times = luaL_checkinteger(lua, 1);
-  if (times < 0) return 0;
-
-  for (size_t i = 0; i < (size_t)times; i++)
-    insert_gap_buffer(editor->buffer, '\n');
-
-  return 0;
-}
-
-bool is_minor_mode(lua_State* lua, const char* mode_name)
-{
-  if (lua == nullptr) return false;
-
-  lua_getglobal(lua, "modes");
-  lua_getfield(lua, -1, mode_name);
-  lua_getfield(lua, -1, "minor");
-
-  bool result = lua_toboolean(lua, -1);
-
-  lua_pop(lua, 3);
-  return result;
-}
-
-int lua_set_mode(lua_State* lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  const char* mode_name = luaL_checkstring(lua, 1);
-  bool save = is_minor_mode(lua, mode_name);
-
-  set_mode(editor, mode_name, save);
-
-  return 0;
-}
-
-int lua_delete_after_cursor(lua_State* lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  delete_after_gap_buffer(editor->buffer);
-  return 0;
-}
-
-int lua_delete_before_cursor(lua_State* lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  delete_before_gap_buffer(editor->buffer);
-  return 0;
-}
-
-int lua_reload_config(lua_State *lua)
-{
-  if (lua == nullptr) return 0;
-  Editor* editor = get_editor(lua);
-  if (editor == nullptr) return 0;
-
-  const char *filename = luaL_optstring(lua, 1, "init.lua");
-  Status result = lua_load_config(lua, filename);
-
-  lua_pushboolean(lua, SUCCEEDED(result));
-
-  return 1;
 }
 
 void register_primitives(lua_State *lua)
 {
   lua_register(lua, "move_cursor", lua_move_cursor);
+  lua_register(lua, "move_cursor_to", lua_move_cursor_to);
   lua_register(lua, "quit_editor", lua_quit_editor);
 
   lua_register(lua, "insert_char", lua_insert_char);
-  lua_register(lua, "set_mode", lua_set_mode);
 
-  lua_register(lua, "insert_newline", lua_insert_newline);
+  lua_register(lua, "set_mode", lua_set_mode);
+  lua_register(lua, "save_mode", lua_save_mode);
+
+  lua_register(lua, "get_mode", lua_get_mode);
+  lua_register(lua, "get_saved_mode", lua_get_saved_mode);
+  lua_register(lua, "restore_mode", lua_restore_mode);
+
+  lua_register(lua, "is_minor_mode", lua_is_minor_mode);
+
+  lua_register(lua, "insert_newlines", lua_insert_newline);
 
   lua_register(lua, "delete_after_cursor", lua_delete_after_cursor);
   lua_register(lua, "delete_before_cursor", lua_delete_before_cursor);

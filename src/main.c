@@ -11,9 +11,6 @@ int main(int argc, char* argv[])
   Editor editor = {};
   editor.buffer = init_gap_buffer();
 
-  editor.current_mode = nullptr;
-  editor.pre_mode = nullptr;
-
   tb_init();
 
   //editor setup

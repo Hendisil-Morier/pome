@@ -1,4 +1,5 @@
 #define TB_IMPL
+
 #include "termbox2.h"
 #include "editor_datatype.h"
 #include "editor.h"
@@ -11,7 +12,8 @@ void render_status_bar (Editor* editor)
   char status_buffer[128] = {};
   Position cur_pos = get_cursor_pos(editor->buffer);
   snprintf(status_buffer, sizeof(status_buffer),
-    "row %zu : col %zu", cur_pos.y + 1, cur_pos.x + 1);
+    "%s | %zu : %zu", editor->modeinfo.current_mode,
+           cur_pos.y + 1, cur_pos.x + 1);
 
   for (size_t i = 0; status_buffer[i]; i++)
     tb_set_cell(i, tb_height() - 1, status_buffer[i], TB_BLACK, TB_WHITE);

@@ -27,21 +27,32 @@ Position get_cursor_pos(gap_buffer *buffer)
   return cur_pos;
 }
 
-void set_mode(Editor* editor, const char* mode_name, bool save)
+void set_mode(Editor* editor, const char* mode_name)
 {
   if (editor == nullptr) return;
 
-  free((void*)editor->pre_mode);
+  free((void*)editor->modeinfo.current_mode);
 
-  if (save == true)
-    editor->pre_mode = editor->current_mode;
-  else
-  {
-    free((void*)editor->current_mode);
-    editor->pre_mode = nullptr;
-  }
+  editor->modeinfo.current_mode = strdup(mode_name);
+}
 
-  editor->current_mode = strdup(mode_name);
+void save_mode(Editor* editor, const char* mode_name)
+{
+  if (editor == nullptr) return;
+
+  free((void*) editor->modeinfo.pre_mode);
+
+  editor->modeinfo.pre_mode = strdup(mode_name);
+}
+
+void restore_mode(Editor* editor)
+{
+  if (editor == nullptr) return;
+
+  free((void*)editor->modeinfo.current_mode);
+
+  editor->modeinfo.current_mode = editor->modeinfo.pre_mode;
+  editor->modeinfo.pre_mode = nullptr;
 }
 
 bool call_keymap(struct tb_event* ev, Editor* editor)
@@ -52,15 +63,17 @@ bool call_keymap(struct tb_event* ev, Editor* editor)
   lua_State *lua = editor->lua;
 
   lua_getglobal(lua, "modes");
-  lua_getfield(lua, -1, editor->current_mode);
+  lua_getfield(lua, -1, editor->modeinfo.current_mode);
   lua_getfield(lua, -1, "keymap");
 
-  lua_pushinteger(lua, ev->key);
+  uint32_t key = ev->key ? ev->key : ev->ch;
+  lua_pushinteger(lua, key);
+
   lua_gettable(lua, -2);
 
   if (lua_isfunction(lua, -1) == false)
   {
-    lua_pop(lua, 1); //pop nil
+    lua_pop(lua, 4); //pop nil
     return false;
   }
 
@@ -70,9 +83,8 @@ bool call_keymap(struct tb_event* ev, Editor* editor)
             lua_tostring(lua, -1));
 
     lua_pop(lua, 1);
+    return false;
   }
-  else
-    lua_pop(lua, 1);
 
   lua_pop(lua, 3);
 
@@ -87,7 +99,7 @@ void call_default(struct tb_event* ev, Editor* editor)
   lua_State *L = editor->lua;
 
   lua_getglobal(L, "modes");
-  lua_getfield(L, -1, editor->current_mode);
+  lua_getfield(L, -1, editor->modeinfo.current_mode);
   lua_getfield(L, -1, "default");
 
   if (ev->ch == 0)
@@ -121,18 +133,20 @@ void process_key(struct tb_event *ev, Editor* editor)
   if (ev == nullptr || editor == nullptr)
     return;
 
-  const char* cur_mode = editor->current_mode;
-  lua_State* lua = editor->lua;
+  const char* mode_before = editor->modeinfo.current_mode;
+
+  bool mode_changed = (mode_before == editor->modeinfo.current_mode);
+  bool current_is_minor = is_minor_mode(editor->lua, editor->modeinfo.current_mode);
+  bool saved_is_major = editor->modeinfo.pre_mode != nullptr
+    &&!is_minor_mode(editor->lua, editor->modeinfo.pre_mode);
 
   bool defau = !call_keymap(ev,editor);
 
   if (defau == true)
     call_default(ev, editor);
 
-  if (editor->current_mode == cur_mode
-      && is_minor_mode(lua, editor->current_mode))
-    set_mode(editor, editor->pre_mode, false);
-
+  if (mode_changed && current_is_minor && saved_is_major)
+    restore_mode(editor);
 }
 
 void quit_editor(Editor* editor)

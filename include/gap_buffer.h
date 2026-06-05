@@ -16,3 +16,6 @@ Status move_gap(gap_buffer* buffer, size_t times, Direction direction);
 Status move_gap_to(gap_buffer* buffer, size_t abs_pos);
 
 char gb_char_at(gap_buffer *buffer, size_t abs_pos);
+
+size_t get_line_start(gap_buffer *buffer, size_t target_line);
+size_t get_line_length(gap_buffer* buffer, size_t target_line);
