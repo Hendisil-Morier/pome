@@ -168,9 +168,16 @@ char gb_char_at(gap_buffer *buffer, size_t abs_pos)
   return buffer->buf[abs_pos];
 }
 
+size_t get_logic_text_len(gap_buffer* buffer)
+{
+  if (buffer == nullptr) return 0; //dont know what else to return
+
+  return buffer->gap_start + (buffer->capacity - buffer->gap_end);
+}
+
 size_t get_line_start(gap_buffer *buffer, size_t target_line)
 {
-  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t logic_text_len = get_logic_text_len(buffer);
   size_t lines = 0;
   for (size_t i = 0; i < logic_text_len; i++)
   {
@@ -182,7 +189,7 @@ size_t get_line_start(gap_buffer *buffer, size_t target_line)
 
 size_t get_line_length(gap_buffer* buffer, size_t target_line)
 {
-  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t logic_text_len = get_logic_text_len(buffer);
   size_t line_start = get_line_start(buffer, target_line);
   size_t i = 0;
 
@@ -196,7 +203,7 @@ size_t get_total_lines(gap_buffer* buffer)
 {
   if (buffer == nullptr) return 0;
 
-  size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  size_t logic_text_len = get_logic_text_len(buffer);
   size_t lines = 1;
   for (size_t i = 0; i < logic_text_len; i++)
   {
@@ -207,15 +214,58 @@ size_t get_total_lines(gap_buffer* buffer)
   return lines;
 }
 
+Position abspos_to_repos(gap_buffer* buffer, size_t abs_pos)
+{
+  Position result = {};
+  if (buffer == nullptr) return result;
+
+  size_t logic_text_len = get_logic_text_len(buffer);
+  if (abs_pos > logic_text_len) abs_pos = logic_text_len;
+
+  size_t x = 0;
+  size_t y = 0;
+
+  for(size_t i = 0; i < abs_pos; i++)
+  {
+    char c = gb_char_at(buffer, i);
+    if (c == '\n')
+    {x = 0; y++;}
+    else x++;
+  }
+
+  result.x = x;
+  result.y = y;
+
+  return result;
+}
+
+size_t repos_to_abspos(gap_buffer* buffer, Position repos)
+{
+  if (buffer == nullptr) return 0; //dont know what to return either
+
+  Position max_pos = abspos_to_repos(buffer, get_logic_text_len(buffer));
+  bool over_grown = repos.x > max_pos.x || repos.y > max_pos.y;
+
+  if (over_grown) return get_logic_text_len(buffer);
+
+  size_t line_at = get_line_start(buffer, repos.y);
+
+  return line_at + repos.x;
+}
+
 size_t min(size_t a, size_t b)
 {
   return (a < b)? a : b;
 }
 
+size_t max(size_t a, size_t b)
+{
+  return (a > b)? a : b;
+}
+
 Status move_gap_vertical(gap_buffer *buffer, size_t target_line)
 {
   if (buffer == nullptr) return FAILURE;
-  /* size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end); */
 
   Position cur_pos = get_cursor_pos(buffer);
   size_t line_length = get_line_length(buffer, target_line);

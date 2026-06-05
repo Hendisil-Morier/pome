@@ -26,3 +26,8 @@ int lua_delete_before_cursor(lua_State* lua);
 int lua_reload_config(lua_State *lua);
 
 int lua_is_minor_mode(lua_State* lua);
+
+int lua_call_mode_hook(lua_State* lua);
+
+int lua_clear_anchor(lua_State* lua);
+int lua_set_anchor(lua_State* lua);

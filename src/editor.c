@@ -27,13 +27,40 @@ Position get_cursor_pos(gap_buffer *buffer)
   return cur_pos;
 }
 
+void call_mode_hook(Editor* editor, const char* mode_name, const char* hook_name)
+{
+  if (editor == nullptr) return;
+  if (mode_name == nullptr) return;
+  lua_State* lua = editor->lua;
+
+  lua_getglobal(lua, "modes");
+  lua_getfield(lua, -1, mode_name);
+  lua_getfield(lua, -1,hook_name);
+
+  if (lua_isfunction(lua, -1))
+  {
+    if (lua_pcall(lua, 0, 0, 0) != LUA_OK)
+    {
+      fprintf(stderr, "Error in %s hook for mode %s: %s\n",
+              hook_name, mode_name, lua_tostring(lua, -1));
+      lua_pop(lua, 1); // pop error message
+    }
+  }
+  else
+    lua_pop(lua, 1); //pop nil
+
+  lua_pop(lua, 2);
+}
+
 void set_mode(Editor* editor, const char* mode_name)
 {
   if (editor == nullptr) return;
 
+  call_mode_hook(editor,editor->modeinfo.current_mode,"on_exit");
   free((void*)editor->modeinfo.current_mode);
 
   editor->modeinfo.current_mode = strdup(mode_name);
+  call_mode_hook(editor,editor->modeinfo.current_mode,"on_enter");
 }
 
 void save_mode(Editor* editor, const char* mode_name)

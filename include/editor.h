@@ -11,3 +11,5 @@ void quit_editor(Editor* editor);
 void set_mode(Editor* editor, const char* mode_name);
 void save_mode(Editor* editor, const char* mode_name);
 void restore_mode(Editor* editor);
+
+void call_mode_hook(Editor* editor, const char* mode_name, const char* hook_name);

@@ -180,6 +180,19 @@ int lua_delete_before_cursor(lua_State* lua)
   return 0;
 }
 
+int lua_call_mode_hook(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  const char* mode_name = luaL_checkstring(lua, 1);
+  const char* hook_name = luaL_checkstring(lua, 2);
+
+  call_mode_hook(editor, mode_name, hook_name);
+  return 0;
+}
+
 int lua_reload_config(lua_State *lua)
 {
   if (lua == nullptr) return 0;
@@ -192,4 +205,31 @@ int lua_reload_config(lua_State *lua)
   lua_pushboolean(lua, SUCCEEDED(result));
 
   return 1;
+}
+
+int lua_set_anchor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  Position cur_pos = get_cursor_pos(editor->buffer);
+  size_t achr_x = luaL_optinteger(lua, 1, cur_pos.x);
+  size_t achr_y = luaL_optinteger(lua, 2, cur_pos.y);
+
+  editor->cursor.anchor = repos_to_abspos(editor->buffer,
+                                    (Position){.x = achr_x, .y = achr_y});
+  editor->cursor.selecting = true;
+
+  return 0;
+}
+
+int lua_clear_anchor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  editor->cursor.selecting = false;
+  return 0;
 }

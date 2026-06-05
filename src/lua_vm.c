@@ -113,6 +113,11 @@ void register_primitives(lua_State *lua)
   lua_register(lua, "delete_after_cursor", lua_delete_after_cursor);
   lua_register(lua, "delete_before_cursor", lua_delete_before_cursor);
 
+  lua_register(lua, "call_mode_hook", lua_call_mode_hook);
+
+  lua_register(lua, "set_anchor", lua_set_anchor);
+  lua_register(lua, "clear_anchor", lua_clear_anchor);
+
   lua_register(lua, "load_config", lua_reload_config);
 }
 

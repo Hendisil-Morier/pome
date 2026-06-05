@@ -28,7 +28,10 @@ void render_char (Editor *editor)
   tb_clear();
 
   gap_buffer* buffer = editor->buffer;
-  const size_t logic_text_len = buffer->gap_start + (buffer->capacity - buffer->gap_end);
+  const size_t logic_text_len = get_logic_text_len(buffer);
+
+  size_t select_start = min(editor->cursor.anchor, editor->buffer->gap_start);
+  size_t select_end  = max(editor->cursor.anchor, editor->buffer->gap_start);
 
   size_t screen_rows = tb_height() - 1;
   size_t screen_x = 0;
@@ -42,6 +45,10 @@ void render_char (Editor *editor)
       screen_y++; screen_x = 0;
       continue;
     }
+
+    bool in_selection = editor->cursor.selecting && i >= select_start && i < select_end;
+
+    auto bg_color = in_selection? TB_BLUE: TB_DEFAULT;
 
     if (c == '\t')
     {
@@ -58,7 +65,7 @@ void render_char (Editor *editor)
     }
 
     if (screen_y >= editor->row_offset && screen_y < editor->row_offset + screen_rows)
-      tb_set_cell(screen_x, screen_y - editor->row_offset, c, TB_DEFAULT, TB_DEFAULT);
+      tb_set_cell(screen_x, screen_y - editor->row_offset, c, TB_DEFAULT, bg_color);
 
     screen_x++;
   }
