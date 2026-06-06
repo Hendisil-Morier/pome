@@ -39,6 +39,12 @@ local visual_keymap = inherit (
     [key_press.k]    = cursor_up,
     [key_press.j]  = cursor_down,
 
+    [key_press.d] = function()
+      delete_selected();
+      clear_anchor();
+      safe_set_mode(normal_mode);
+    end,
+
     [key_press.v] = bind(safe_set_mode, normal_mode),
   },
   base_keymap

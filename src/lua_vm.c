@@ -118,6 +118,8 @@ void register_primitives(lua_State *lua)
   lua_register(lua, "set_anchor", lua_set_anchor);
   lua_register(lua, "clear_anchor", lua_clear_anchor);
 
+  lua_register(lua, "delete_selected", lua_delete_selected);
+
   lua_register(lua, "load_config", lua_reload_config);
 }
 

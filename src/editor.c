@@ -197,3 +197,16 @@ void update_scroll(Editor* editor)
  if (cur_pos.y >= editor->row_offset + screen_row)
    editor->row_offset = cur_pos.y - screen_row + 1;
 }
+
+void delete_selected(Editor* editor)
+{
+  if (editor == nullptr) return;
+
+  cursor_state cursor = editor->cursor;
+  gap_buffer* buffer = editor->buffer;
+
+  if (cursor.anchor > buffer->gap_end)
+    buffer->gap_end = cursor.anchor;
+  else if (cursor.anchor < buffer->gap_start)
+    buffer->gap_start = cursor.anchor;
+}

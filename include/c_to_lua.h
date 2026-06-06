@@ -31,3 +31,5 @@ int lua_call_mode_hook(lua_State* lua);
 
 int lua_clear_anchor(lua_State* lua);
 int lua_set_anchor(lua_State* lua);
+
+int lua_delete_selected(lua_State* lua);

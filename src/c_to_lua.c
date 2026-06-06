@@ -233,3 +233,13 @@ int lua_clear_anchor(lua_State* lua)
   editor->cursor.selecting = false;
   return 0;
 }
+
+int lua_delete_selected(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  delete_selected(editor);
+  return 0;
+}
