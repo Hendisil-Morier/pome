@@ -48,6 +48,7 @@ typedef struct
 {
   const char* current_mode;
   const char* pre_mode;
+  size_t change_count;
 } mode_info;
 
 typedef struct

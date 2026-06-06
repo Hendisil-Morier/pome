@@ -60,6 +60,8 @@ void set_mode(Editor* editor, const char* mode_name)
   free((void*)editor->modeinfo.current_mode);
 
   editor->modeinfo.current_mode = strdup(mode_name);
+  editor->modeinfo.change_count++;
+
   call_mode_hook(editor,editor->modeinfo.current_mode,"on_enter");
 }
 
@@ -160,17 +162,19 @@ void process_key(struct tb_event *ev, Editor* editor)
   if (ev == nullptr || editor == nullptr)
     return;
 
-  const char* mode_before = editor->modeinfo.current_mode;
-
-  bool mode_changed = (mode_before == editor->modeinfo.current_mode);
-  bool current_is_minor = is_minor_mode(editor->lua, editor->modeinfo.current_mode);
-  bool saved_is_major = editor->modeinfo.pre_mode != nullptr
-    &&!is_minor_mode(editor->lua, editor->modeinfo.pre_mode);
+  size_t mode_before = editor->modeinfo.change_count;
 
   bool defau = !call_keymap(ev,editor);
 
   if (defau == true)
     call_default(ev, editor);
+
+  bool mode_changed = (mode_before == editor->modeinfo.change_count);
+
+  bool current_is_minor = is_minor_mode(editor->lua, editor->modeinfo.current_mode);
+  bool saved_is_major = editor->modeinfo.pre_mode != nullptr
+    &&!is_minor_mode(editor->lua, editor->modeinfo.pre_mode);
+
 
   if (mode_changed && current_is_minor && saved_is_major)
     restore_mode(editor);
@@ -205,8 +209,10 @@ void delete_selected(Editor* editor)
   cursor_state cursor = editor->cursor;
   gap_buffer* buffer = editor->buffer;
 
-  if (cursor.anchor > buffer->gap_end)
-    buffer->gap_end = cursor.anchor;
+  size_t gap_size = (buffer->gap_end - buffer->gap_start);
+
+  if (cursor.anchor > buffer->gap_start)
+    buffer->gap_end = cursor.anchor + gap_size;
   else if (cursor.anchor < buffer->gap_start)
     buffer->gap_start = cursor.anchor;
 }

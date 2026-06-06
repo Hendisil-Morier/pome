@@ -33,3 +33,11 @@ int lua_clear_anchor(lua_State* lua);
 int lua_set_anchor(lua_State* lua);
 
 int lua_delete_selected(lua_State* lua);
+int lua_save_file(lua_State* lua);
+
+int lua_get_line_end_cursor(lua_State* lua);
+int lua_get_line_num_cursor(lua_State* lua);
+int lua_get_cursor_pos(lua_State* lua);
+
+int lua_cursor_forward_match(lua_State* lua);
+int lua_cursor_backward_match(lua_State* lua);

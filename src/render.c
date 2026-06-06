@@ -12,8 +12,8 @@ void render_status_bar (Editor* editor)
   char status_buffer[128] = {};
   Position cur_pos = get_cursor_pos(editor->buffer);
   snprintf(status_buffer, sizeof(status_buffer),
-    "%s | %zu : %zu", editor->modeinfo.current_mode,
-           cur_pos.y + 1, cur_pos.x + 1);
+    "%s | %zu : %zu | file: %s", editor->modeinfo.current_mode,
+           cur_pos.y + 1, cur_pos.x + 1, editor->filename);
 
   for (size_t i = 0; status_buffer[i]; i++)
     tb_set_cell(i, tb_height() - 1, status_buffer[i], TB_BLACK, TB_WHITE);

@@ -23,8 +23,6 @@ int main(int argc, char* argv[])
 
   //lua set up
   init_lua(&editor);
-  register_primitives(editor.lua);
-  register_constant(editor.lua);
 
   //load config
   lua_load_config(editor.lua, "init.lua");

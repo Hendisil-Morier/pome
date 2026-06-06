@@ -7,6 +7,85 @@
 #include "c_to_lua.h"
 
 Editor* get_editor(lua_State *lua);
+void register_constant(lua_State *lua);
+void register_primitives(lua_State *lua);
+
+typedef struct
+{
+  const char* name;
+  lua_CFunction func_pointer;
+} lua_name_function;
+
+typedef struct
+{
+  const char* name;
+  int value;
+} lua_name_intconst;
+
+const lua_name_function func_api[] = {
+  {"move_cursor",          lua_move_cursor},
+  {"move_cursor_to",       lua_move_cursor_to},
+
+  {"quit_editor",          lua_quit_editor},
+
+  {"insert_char",          lua_insert_char},
+
+  {"set_mode",             lua_set_mode},
+  {"save_mode",            lua_save_mode},
+  {"get_mode",             lua_get_mode},
+  {"get_saved_mode",       lua_get_saved_mode},
+
+  {"restore_mode",         lua_restore_mode},
+  {"is_minor_mode",        lua_is_minor_mode},
+
+  {"insert_newlines",      lua_insert_newline},
+
+  {"delete_after_cursor",  lua_delete_after_cursor},
+  {"delete_before_cursor", lua_delete_before_cursor},
+
+  {"call_mode_hook",       lua_call_mode_hook},
+
+  {"set_anchor",           lua_set_anchor},
+  {"clear_anchor",         lua_clear_anchor},
+
+  {"delete_selected",      lua_delete_selected},
+
+  {"load_config",          lua_reload_config},
+  {"save_file",            lua_save_file},
+
+  {"get_line_end_cursor", lua_get_line_end_cursor},
+  {"get_line_num_cursor", lua_get_line_num_cursor},
+
+  {"get_cursor_pos", lua_get_cursor_pos},
+  {"cursor_forward_match", lua_cursor_forward_match},
+  {"cursor_backward_match", lua_cursor_backward_match},
+};
+
+const lua_name_intconst intconst_api[] = {
+  // directions
+  {"right",   DIR_RIGHT},
+  {"left",    DIR_LEFT},
+  {"up",      DIR_UP},
+  {"down",    DIR_DOWN},
+
+  // arrow keys
+  {"arrow_left",  TB_KEY_ARROW_LEFT},
+  {"arrow_right", TB_KEY_ARROW_RIGHT},
+  {"arrow_up",    TB_KEY_ARROW_UP},
+  {"arrow_down",  TB_KEY_ARROW_DOWN},
+
+  // misc keys
+  {"backspace",   TB_KEY_BACKSPACE},
+  {"backspace2",  TB_KEY_BACKSPACE2},
+  {"delete",      TB_KEY_DELETE},
+  {"enter",       TB_KEY_ENTER},
+  {"esc",         TB_KEY_ESC},
+
+  // control combinations
+  {"ctrl_r", TB_KEY_CTRL_R},
+  {"ctrl_q", TB_KEY_CTRL_Q},
+  {"ctrl_s", TB_KEY_CTRL_S},
+};
 
 void init_lua(Editor* editor)
 {
@@ -19,6 +98,9 @@ void init_lua(Editor* editor)
 
   editor->lua = lua;
   luaL_openlibs(lua);
+
+  register_primitives(lua);
+  register_constant(lua);
 
   lua_pushlightuserdata(lua, editor);
   lua_setfield(lua, LUA_REGISTRYINDEX, "editor");
@@ -41,37 +123,25 @@ void lua_set_intfield(lua_State* lua, int value, const char* name)
   lua_setfield(lua, -2, name);
 }
 
+void register_function(lua_State* lua, const char* func_name, lua_CFunction func_pointer)
+{
+  lua_pushcfunction(lua, func_pointer);
+  lua_setfield(lua, -2, func_name);
+}
+
 void register_constant(lua_State *lua)
 {
   //directions
   lua_newtable(lua);
-
-  lua_set_intfield(lua, DIR_RIGHT, "right");
-  lua_set_intfield(lua, DIR_LEFT, "left");
-  lua_set_intfield(lua, DIR_UP, "up");
-  lua_set_intfield(lua, DIR_DOWN, "down");
-
+  for (size_t i = 0; i < 4; i++)   // first 4 entries are directions
+    lua_set_intfield(lua, intconst_api[i].value, intconst_api[i].name);
   lua_setglobal(lua, "direction");
 
   //##keymap
   lua_newtable(lua);
 
-  //arrow keys
-  lua_set_intfield(lua, TB_KEY_ARROW_LEFT, "arrow_left");
-  lua_set_intfield(lua, TB_KEY_ARROW_RIGHT, "arrow_right");
-  lua_set_intfield(lua, TB_KEY_ARROW_UP, "arrow_up");
-  lua_set_intfield(lua, TB_KEY_ARROW_DOWN, "arrow_down");
-
-  //misc keys
-  lua_set_intfield(lua, TB_KEY_BACKSPACE, "backspace");
-  lua_set_intfield(lua, TB_KEY_BACKSPACE2, "backspace2");
-  lua_set_intfield(lua, TB_KEY_DELETE, "delete");
-  lua_set_intfield(lua, TB_KEY_ENTER, "enter");
-
-  lua_set_intfield(lua, TB_KEY_ESC, "esc");
-
-  lua_set_intfield(lua, TB_KEY_CTRL_R, "ctrl_r");
-  lua_set_intfield(lua, TB_KEY_CTRL_Q, "ctrl_q");
+  for (size_t i = 4; i < sizeof(intconst_api)/sizeof(intconst_api[0]); i++)
+    lua_set_intfield(lua, intconst_api[i].value, intconst_api[i].name);
 
   //printable character
   //lowercase
@@ -93,34 +163,13 @@ void register_constant(lua_State *lua)
 
 void register_primitives(lua_State *lua)
 {
-  lua_register(lua, "move_cursor", lua_move_cursor);
-  lua_register(lua, "move_cursor_to", lua_move_cursor_to);
-  lua_register(lua, "quit_editor", lua_quit_editor);
+  // create the 'pome' namespace table
+  lua_newtable(lua);
 
-  lua_register(lua, "insert_char", lua_insert_char);
+  for (size_t i = 0; i < sizeof(func_api)/sizeof(func_api[0]); i++)
+    register_function(lua, func_api[i].name, func_api[i].func_pointer);
 
-  lua_register(lua, "set_mode", lua_set_mode);
-  lua_register(lua, "save_mode", lua_save_mode);
-
-  lua_register(lua, "get_mode", lua_get_mode);
-  lua_register(lua, "get_saved_mode", lua_get_saved_mode);
-  lua_register(lua, "restore_mode", lua_restore_mode);
-
-  lua_register(lua, "is_minor_mode", lua_is_minor_mode);
-
-  lua_register(lua, "insert_newlines", lua_insert_newline);
-
-  lua_register(lua, "delete_after_cursor", lua_delete_after_cursor);
-  lua_register(lua, "delete_before_cursor", lua_delete_before_cursor);
-
-  lua_register(lua, "call_mode_hook", lua_call_mode_hook);
-
-  lua_register(lua, "set_anchor", lua_set_anchor);
-  lua_register(lua, "clear_anchor", lua_clear_anchor);
-
-  lua_register(lua, "delete_selected", lua_delete_selected);
-
-  lua_register(lua, "load_config", lua_reload_config);
+  lua_setglobal(lua, "pome");   // all functions now live under `pome`
 }
 
 Editor* get_editor(lua_State *lua)

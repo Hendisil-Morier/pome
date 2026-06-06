@@ -27,3 +27,6 @@ size_t get_logic_text_len(gap_buffer* buffer);
 
 Position abspos_to_repos(gap_buffer* buffer, size_t abs_pos);
 size_t repos_to_abspos(gap_buffer* buffer, Position repos);
+
+bool forward_match(gap_buffer* buffer, size_t from, char matcher, size_t* result);
+bool backward_match(gap_buffer* buffer, size_t from, char matcher, size_t* result);

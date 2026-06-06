@@ -4,6 +4,7 @@
 #include "gap_buffer.h"
 #include "lua_vm.h"
 #include "editor.h"
+#include "file_handling.h"
 
 int lua_move_cursor(lua_State* lua)
 {
@@ -221,6 +222,9 @@ int lua_set_anchor(lua_State* lua)
                                     (Position){.x = achr_x, .y = achr_y});
   editor->cursor.selecting = true;
 
+  /* fprintf(stderr, "anchor set to %zu\n", editor->cursor.anchor); */
+  /* fprintf(stderr, "cur_pos x=%zu y=%zu\n", cur_pos.x, cur_pos.y); */
+
   return 0;
 }
 
@@ -242,4 +246,103 @@ int lua_delete_selected(lua_State* lua)
 
   delete_selected(editor);
   return 0;
+}
+
+int lua_save_file(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  save_file(editor);
+  return 0;
+}
+
+int lua_get_line_end_cursor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  Position cur_pos = get_cursor_pos(editor->buffer);
+  size_t line_end = get_line_length(editor->buffer, cur_pos.y);
+
+  lua_pushinteger(lua, line_end);
+
+  return 1;
+}
+
+int lua_get_line_num_cursor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  Position cur_pos = get_cursor_pos(editor->buffer);
+
+  lua_pushinteger(lua, cur_pos.y);
+
+  return 1;
+}
+
+int lua_get_cursor_pos(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  Position p = get_cursor_pos(editor->buffer);
+  lua_pushinteger(lua, p.x);   // first return value
+  lua_pushinteger(lua, p.y);   // second return value
+  return 2;                    // "I am returning 2 values"
+}
+
+int lua_cursor_forward_match(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  char matcher = (char) luaL_checkinteger(lua, 1);
+  size_t result;
+  Position pos;
+
+  bool found = forward_match(editor->buffer,editor->buffer->gap_start, matcher, &result);
+
+  if (found)
+  {
+    pos = abspos_to_repos(editor->buffer, result);
+
+    lua_pushinteger(lua, pos.x);
+    lua_pushinteger(lua, pos.y);
+    return 2;
+  }
+
+  lua_pushnil(lua);
+  return 1;
+}
+
+int lua_cursor_backward_match(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  char matcher = (char) luaL_checkinteger(lua, 1);
+  size_t result;
+  Position pos;
+
+  bool found = backward_match(editor->buffer,editor->buffer->gap_start, matcher, &result);
+
+  if (found)
+  {
+    pos = abspos_to_repos(editor->buffer, result);
+
+    lua_pushinteger(lua, pos.x);
+    lua_pushinteger(lua, pos.y);
+    return 2;
+  }
+
+  lua_pushnil(lua);
+  return 1;
 }

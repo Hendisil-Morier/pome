@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
@@ -181,9 +182,15 @@ size_t get_line_start(gap_buffer *buffer, size_t target_line)
   size_t lines = 0;
   for (size_t i = 0; i < logic_text_len; i++)
   {
-    if (lines == target_line) return i;
+    if (lines == target_line)
+    {
+      /* fprintf(stderr, " -> early return at i=%zu\n", i); */
+      return i;
+    }
     if (gb_char_at(buffer, i) == '\n') lines++;
   }
+  /* fprintf(stderr, "get_line_start(target=%zu) logic_len=%zu returning %zu\n", */
+  /*         target_line, logic_text_len, logic_text_len); */
   return logic_text_len;
 }
 
@@ -235,6 +242,7 @@ Position abspos_to_repos(gap_buffer* buffer, size_t abs_pos)
 
   result.x = x;
   result.y = y;
+  /* fprintf(stderr, "abspos_to_repos(abs=%zu) -> (%zu,%zu)\n", abs_pos, result.x, result.y); */
 
   return result;
 }
@@ -244,7 +252,11 @@ size_t repos_to_abspos(gap_buffer* buffer, Position repos)
   if (buffer == nullptr) return 0; //dont know what to return either
 
   Position max_pos = abspos_to_repos(buffer, get_logic_text_len(buffer));
-  bool over_grown = repos.x > max_pos.x || repos.y > max_pos.y;
+  bool over_grown = repos.y > max_pos.y ||
+                    (repos.y == max_pos.y && repos.x > max_pos.x);
+
+  /* fprintf(stderr, "repos_to_abspos: repos=(%zu,%zu) max_pos=(%zu,%zu) over_grown=%d logic_len=%zu\n", */
+  /*         repos.x, repos.y, max_pos.x, max_pos.y, over_grown, get_logic_text_len(buffer)); */
 
   if (over_grown) return get_logic_text_len(buffer);
 
@@ -302,4 +314,38 @@ Status move_gap(gap_buffer* buffer, size_t times, Direction direction)
     default:
       return FAILURE;
   }
+}
+
+bool forward_match(gap_buffer* buffer, size_t from, char matcher, size_t* result)
+{
+  if (buffer == nullptr) return false;
+
+  for (; from < get_logic_text_len(buffer); from++)
+  {
+    char c = gb_char_at(buffer, from);
+    if (matcher == c)
+    {
+      *result = from;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool backward_match(gap_buffer* buffer, size_t from, char matcher, size_t* result)
+{
+  if (buffer == nullptr) return false;
+
+  for (; from != (size_t) -1; from--)
+  {
+    char c = gb_char_at(buffer, from);
+    if (matcher == c)
+    {
+      *result = from;
+      return true;
+    }
+  }
+
+  return false;
 }
