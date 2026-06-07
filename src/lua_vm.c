@@ -59,6 +59,9 @@ const lua_name_function func_api[] = {
   {"get_cursor_pos", lua_get_cursor_pos},
   {"cursor_forward_match", lua_cursor_forward_match},
   {"cursor_backward_match", lua_cursor_backward_match},
+
+  {"char_at_cursor", lua_char_at_cursor},
+  {"get_total_lines", lua_get_total_lines},
 };
 
 const lua_name_intconst intconst_api[] = {

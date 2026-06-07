@@ -78,20 +78,6 @@ int lua_insert_newline(lua_State *lua)
   return 0;
 }
 
-bool is_minor_mode(lua_State* lua, const char* mode_name)
-{
-  if (lua == nullptr) return false;
-
-  lua_getglobal(lua, "modes");
-  lua_getfield(lua, -1, mode_name);
-  lua_getfield(lua, -1, "minor");
-
-  bool result = lua_toboolean(lua, -1);
-
-  lua_pop(lua, 3);
-  return result;
-}
-
 int lua_is_minor_mode(lua_State* lua)
 {
   if (lua == nullptr) return 0;
@@ -99,7 +85,7 @@ int lua_is_minor_mode(lua_State* lua)
   if (editor == nullptr) return 0;
 
   const char* mode_name = luaL_checkstring(lua, 1);
-  bool result = is_minor_mode(lua, mode_name);
+  bool result = is_minor_mode(editor, mode_name);
   lua_pushboolean(lua, result);
 
   return 1;
@@ -344,5 +330,30 @@ int lua_cursor_backward_match(lua_State* lua)
   }
 
   lua_pushnil(lua);
+  return 1;
+}
+
+int lua_char_at_cursor(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  char c = gb_char_at(editor->buffer, editor->buffer->gap_start);
+  char result[2] = {c, '\0'};
+
+  lua_pushstring(lua, result);
+  return 1;
+}
+
+int lua_get_total_lines(lua_State* lua)
+{
+  if (lua == nullptr) return 0;
+  Editor* editor = get_editor(lua);
+  if (editor == nullptr) return 0;
+
+  size_t total_line = get_total_lines(editor->buffer);
+
+  lua_pushinteger(lua, total_line);
   return 1;
 }

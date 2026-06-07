@@ -1,7 +1,22 @@
 #include "editor_datatype.h"
 #include "gap_buffer.h"
 #include "termbox2.h"
-#include "lua_vm.h"
+
+bool is_minor_mode(Editor* editor, const char* mode_name)
+{
+  if (editor == nullptr) return false;
+
+  lua_State* lua = editor->lua;
+
+  lua_getglobal(lua, "modes");
+  lua_getfield(lua, -1, mode_name);
+  lua_getfield(lua, -1, "minor");
+
+  bool result = lua_toboolean(lua, -1);
+
+  lua_pop(lua, 3);
+  return result;
+}
 
 Position get_cursor_pos(gap_buffer *buffer)
 {
@@ -171,9 +186,9 @@ void process_key(struct tb_event *ev, Editor* editor)
 
   bool mode_changed = (mode_before == editor->modeinfo.change_count);
 
-  bool current_is_minor = is_minor_mode(editor->lua, editor->modeinfo.current_mode);
+  bool current_is_minor = is_minor_mode(editor, editor->modeinfo.current_mode);
   bool saved_is_major = editor->modeinfo.pre_mode != nullptr
-    &&!is_minor_mode(editor->lua, editor->modeinfo.pre_mode);
+    &&!is_minor_mode(editor, editor->modeinfo.pre_mode);
 
 
   if (mode_changed && current_is_minor && saved_is_major)

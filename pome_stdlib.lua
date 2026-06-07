@@ -24,8 +24,6 @@ function cursor_line_start()
 end
 
 function delete_line()
-  local cur_x, cur_y = pome.get_cursor_pos();
-
   cursor_line_start();
 
   local y = pome.get_line_num_cursor();
@@ -33,6 +31,4 @@ function delete_line()
   pome.set_anchor(0, y + 1);
   pome.delete_selected();
   pome.clear_anchor();
-
-  pome.move_cursor_to(cur_x, cur_y);
 end
