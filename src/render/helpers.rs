@@ -1,4 +1,12 @@
-use ratatui::{Frame, buffer::Buffer, layout::Position, style::{Color, Style}};
+use ratatui::{
+    Frame,
+    buffer::Buffer,
+    layout::Position,
+    style::{
+        Color,
+        Style
+    }
+};
 use ropey::Rope;
 
 use crate::{data_types::{misc::CursorInfo, render::PanelColor}, render::structs::DrawContext};
