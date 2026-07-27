@@ -81,6 +81,8 @@ If no file is given, pome opens an empty buffer.
 
 ## Configuration
 
+Check this out for the entire thing (or so I hope) **[Lua API Reference](docs/API.md)**
+
 The config directory (`config/`) is a Lua package loaded at startup. The entry point is `config/init.lua`. You can point pome at your own config directory with `--config`.
 
 A mode is just a Lua table:
@@ -108,7 +110,6 @@ These are known gaps in the current version.
 - **Search** — no `/` forward search or `?` backward search
 - **Yank and paste** — no register system; visual delete does not copy to a clipboard
 - **Count prefixes** — `5j`, `3w`, etc. are not supported
-- **Command-line mode** — no `:` prompt for ex-style commands
 - **Multiple buffers** — only one file can be open at a time
 - **Split windows** — the panel system supports arbitrary rects but no built-in split management
 - **Mouse support** — click to move cursor, scroll, etc.
@@ -123,3 +124,12 @@ These are known gaps in the current version.
 | `crossterm` | Terminal input and cursor control |
 | `ropey` | Rope data structure for the text buffer |
 | `serde` | Panel layout deserialization |
+
+
+## AI Usage
+
+I used AI, yes. This README, the API reference document and partially the Lua core's code. Except for this AI usage section I guess.
+
+My reason for blasphemy: I dont have much experience in Lua or writing documents. This project was worked on in my free time and I want something presentable. For now.
+
+Any help to atone my sins is always welcome.
