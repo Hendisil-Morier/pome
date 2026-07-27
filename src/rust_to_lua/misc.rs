@@ -1,3 +1,4 @@
+
 use ratatui::crossterm::{
     cursor::SetCursorStyle,
     event::Event,
@@ -47,23 +48,29 @@ pub fn lua_char_at(lua: &Lua, (x, y): (Option<usize>, Option<usize>))
 pub fn lua_get_max_line_index(lua: &Lua, _: ())
 -> mlua::Result<usize>
 {
-  get_editor!(editor from lua);
-	return Ok(editor.max_index_lines());
+    get_editor!(editor from lua);
+    return Ok(editor.max_index_lines());
 }
 
 pub fn lua_next_key(_: &Lua, _: ()) -> mlua::Result<Option<String>>
 {
-  let event = ratatui::crossterm::event::read()?;
-  
-  if let Event::Key(k) = event
-  {
-    if !k.is_press() && !k.is_repeat()
-    {return Ok(None);}
-    
-    return Ok(keyevent_to_string(k.code, k.modifiers))
-  }
-  
-  return Ok(None);
+    let timeout = std::time::Duration::from_millis(16);
+
+    let poll = ratatui::crossterm::event::poll(timeout)?;
+
+    if poll == false {return Ok(None);}
+
+    let event = ratatui::crossterm::event::read()?;
+
+    if let Event::Key(kvent) = event
+    {
+        if !kvent.is_press() && !kvent.is_repeat()
+        {return Ok(None);}
+
+        return Ok(keyevent_to_string(kvent.code, kvent.modifiers))
+    }
+
+    return Ok(None);
 }
 
 pub fn lua_draw_panels(lua: &Lua, panels: mlua::Value) -> mlua::Result<()>
