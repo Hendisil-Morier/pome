@@ -2,35 +2,43 @@
 local std = require("stdlib")
 local base = require("modes.base_keymap")
 
+local register = std.register
+local mode = std.mode
+local motion = std.motion
+local editing = std.editing
+
 local function make_normal_config()
   local keymap = inherit(
     {
-      [key.h] = std.cursor_left,
-      [key.l] = std.cursor_right,
-      [key.k] = std.cursor_up,
-      [key.j] = std.cursor_down,
+      [key.h] = motion.cursor_left,
+      [key.l] = motion.cursor_right,
+      [key.k] = motion.cursor_up,
+      [key.j] = motion.cursor_down,
 
-      [key.d] = bind(std.enter_minor_mode, "d_pending"),
-      [key.g] = bind(std.enter_minor_mode, "g_pending"),
-      [key.shift.G] = std.goto_lastline,
-      [key.i] = bind(std.safe_set_mode, "insert"),
-      [key.v] = bind(std.safe_set_mode, "visual"),
-      [key.w] = std.word_forward,
-      [key.b] = std.word_backward,
+      [key.d] = bind(mode.enter_minor_mode, "d_pending"),
+      [key.g] = bind(mode.enter_minor_mode, "g_pending"),
+      [key.shift.G] = motion.goto_lastline,
+      [key.i] = bind(mode.safe_set_mode, "insert"),
+      [key.v] = bind(mode.safe_set_mode, "visual"),
+      [key.w] = motion.word_forward,
+      [key.b] = motion.word_backward,
       
       [key.o] = function()
-        std.cursor_line_end()
-        std.insert_newline()
+        motion.cursor_line_end()
+        editing.insert_newline()
       end,
       
-      [":"] = bind(std.safe_set_mode, "command"),
-      ["shift+:"] = bind(std.safe_set_mode, "command"),
+      [":"] = bind(mode.safe_set_mode, "command"),
+      ["shift+:"] = bind(mode.safe_set_mode, "command"),
       
       [key.u] = pome.undo,
       [key.shift.U] = pome.redo,
+
+      [key.p] = bind(register.paste_after),
     },
+
     base
-    );
+  );
 
   local sequences =
     {

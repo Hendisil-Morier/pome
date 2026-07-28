@@ -1,13 +1,14 @@
 local std = require("stdlib")
-local safe_set_mode = std.safe_set_mode
+
+local motion = std.motion
 
 return {
-  [key.left]       = std.cursor_left,
-  [key.right]      = std.cursor_right,
-  [key.up]         = std.cursor_up,
-  [key.down]       = std.cursor_down,
+  [key.left]       = motion.cursor_left,
+  [key.right]      = motion.cursor_right,
+  [key.up]         = motion.cursor_up,
+  [key.down]       = motion.cursor_down,
 
-  [key.esc]        = bind(safe_set_mode, "normal"),
+  [key.esc]        = bind(std.mode.safe_set_mode, "normal"),
   [key.ctrl.r]  = function() dofile(pome.get_config_dir() .. "/init.lua") end,
   [key.ctrl.q]  = pome.quit_editor,
   [key.ctrl.s]  = pome.save_file,

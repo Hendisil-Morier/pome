@@ -17,4 +17,4 @@ local std = require("stdlib")
 require("modes")
 
 -- Start in normal mode
-std.safe_set_mode("normal")
+std.mode.safe_set_mode("normal")

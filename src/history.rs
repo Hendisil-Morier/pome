@@ -101,7 +101,7 @@ impl History
       self.current_batch = Some(EditBatch::new(cursor_before));
     }
     
-    //current_batch should alway how Some(EditBatch)
+    //current_batch should alway hold Some(EditBatch)
     //at this point. unwrap panics means something fishy
     //going on
     let batch = self.current_batch.as_mut().unwrap();
@@ -114,36 +114,36 @@ impl History
 
 impl History
 {
-  //return an undo batch
-  //to operate on
-  pub fn undo(&mut self)
-  -> Option<&EditBatch>
-  {
-    //commit open batch
-    self.commit_current_batch();
+    //return an undo batch
+    //to operate on
+    pub fn undo(&mut self)
+    -> Option<&EditBatch>
+    {
+        //commit open batch
+        self.commit_current_batch();
+        
+        if self.position == 0 {return None;}
+        
+        self.position -= 1;
+        Some(&self.batches[self.position])
+    }
     
-    if self.position == 0 {return None;}
-    
-    self.position -= 1;
-    Some(&self.batches[self.position])
-  }
-  
-  //return an redo batch
-  //to operate on
-  pub fn redo(&mut self)
-  -> Option<&EditBatch>
-  {
-    self.commit_current_batch();
-    
-    if self.position >=self.batches.len()
-    {return None;}
-    
-    let batch = &self.batches[self.position];
-    
-    //increment back from previous undo
-    self.position += 1;
-    return Some(batch);
-  }
+    //return an redo batch
+    //to operate on
+    pub fn redo(&mut self)
+    -> Option<&EditBatch>
+    {
+        self.commit_current_batch();
+        
+        if self.position >=self.batches.len()
+        {return None;}
+        
+        let batch = &self.batches[self.position];
+        
+        //increment back from previous undo
+        self.position += 1;
+        return Some(batch);
+    }
 }
 
 impl History

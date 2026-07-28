@@ -53,8 +53,8 @@ fn main() -> io::Result<()>
     if let Err(e) = lua.load(
         std::path::Path::new(&parsed.config_file)).exec()
     {
-        eprintln!("failed to load config: {e}");
         ratatui::restore();
+        eprintln!("failed to load config: {e}");
         std::process::exit(1);
     }
 

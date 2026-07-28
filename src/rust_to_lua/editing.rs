@@ -62,13 +62,23 @@ pub fn lua_clear_anchor(lua: &Lua, _: ())
 }
 
 pub fn lua_delete_selected(lua: &Lua, _: ())
--> mlua::Result<()>
+-> mlua::Result<Option<String>>
 {
-  get_editor!(mut editor from lua);
-	
-	editor.delete_selected();
-	
-	return Ok(());
+    get_editor!(mut editor from lua);
+
+    let removed = editor.delete_selected();
+
+    return Ok(removed);
+}
+
+pub fn lua_get_selected(lua: &Lua, _: ())
+-> mlua::Result<Option<String>>
+{
+    get_editor!(editor from lua);
+
+    let selected = editor.get_selected();
+
+    return Ok(selected);
 }
 
 pub fn lua_delete_after(lua: &Lua, _: ())

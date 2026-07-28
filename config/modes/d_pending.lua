@@ -2,10 +2,12 @@
 local std = require("stdlib")
 local base = require("modes.base_keymap")
 
+local editing = std.editing
+
 local function make_d_pending_config()
   local keymap = inherit(
     {
-      [key.d] = std.delete_line,   -- dd → delete whole line
+      [key.d] = editing.delete_line,
     },
     base
   )

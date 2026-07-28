@@ -1,1 +1,8 @@
-return {prefer_x = 0}
+-- stdlib/state.lua
+-- contain states, duh
+
+return
+  {
+    register = '"',
+    prefer_x = 0
+  }
