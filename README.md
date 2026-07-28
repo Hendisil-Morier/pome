@@ -4,6 +4,14 @@ A terminal text editor where the editing logic lives entirely in Lua.
 
 The Rust core is mode-agnostic — it exposes primitives for cursor movement, text mutation, rendering, and file I/O. Lua composes those primitives into a full modal editor with keymaps, modes, and the event loop itself. You can redefine or replace the entire editing system without touching Rust.
 
+## AI Usage
+
+I used AI, yes. This README, the API reference document and mostly the Lua core's code. Except for this AI usage section I guess.
+
+My reason for this blasphemy: I dont have much experience in Lua or writing documents. This project was worked on in my free time and I want something presentable. For now.
+
+Any help to atone my sins is always welcome.
+
 ## Features
 
 - Modal editing (normal, insert, visual) defined purely in Lua
@@ -124,12 +132,3 @@ These are known gaps in the current version.
 | `crossterm` | Terminal input and cursor control |
 | `ropey` | Rope data structure for the text buffer |
 | `serde` | Panel layout deserialization |
-
-
-## AI Usage
-
-I used AI, yes. This README, the API reference document and partially the Lua core's code. Except for this AI usage section I guess.
-
-My reason for blasphemy: I dont have much experience in Lua or writing documents. This project was worked on in my free time and I want something presentable. For now.
-
-Any help to atone my sins is always welcome.
