@@ -55,12 +55,41 @@ function M.delete_to_line_end()
     return
   end
   pome.set_anchor(x, y)
-  pome.move_cursor_to(line_end, y)
+  motion.move_cursor_to(line_end, y)
   pome.delete_selected()
   pome.clear_anchor()
 end
 
 -- add newline and enter insert mode
+-- sidestepping moving cursor 'cause it would cause
+-- redo/undo misbehave
+function M.openline(shift)
+    local _, y = pome.get_cursor_pos()
+
+    if shift ~= nil and shift ~= false then
+        -- open line above
+        pome.insert_char('\n', 0, y)
+        motion.move_cursor_to(0, y)
+        mode.safe_set_mode("insert")
+        return
+    end
+    
+    -- open line below
+    local next_y = y + 1
+    local max = pome.get_max_line_index()
+
+    -- if at the last line
+    if next_y > max then
+        local line_end = pome.get_line_end(y)
+        motion.move_cursor_to(line_end, y)
+        pome.insert_char('\n')
+    else
+        pome.insert_char('\n', 0, next_y)
+        motion.move_cursor_to(0, next_y)
+    end
+    
+    mode.safe_set_mode("insert")
+end
 
 
 return M

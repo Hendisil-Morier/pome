@@ -19,7 +19,7 @@ function M.yank()
   end
 end
 
-function M.paste_after()
+function M.paste()
     local current_register = state.register or '"'
     local txt = store[current_register]
     if not txt or (txt == "") then return end;

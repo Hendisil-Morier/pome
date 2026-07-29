@@ -8,37 +8,35 @@ local motion = std.motion
 local editing = std.editing
 
 local function make_normal_config()
-  local keymap = inherit(
+local keymap = inherit(
     {
-      [key.h] = motion.cursor_left,
-      [key.l] = motion.cursor_right,
-      [key.k] = motion.cursor_up,
-      [key.j] = motion.cursor_down,
-
-      [key.d] = bind(mode.enter_minor_mode, "d_pending"),
-      [key.g] = bind(mode.enter_minor_mode, "g_pending"),
-      [key.shift.G] = motion.goto_lastline,
-      [key.i] = bind(mode.safe_set_mode, "insert"),
-      [key.v] = bind(mode.safe_set_mode, "visual"),
-      [key.w] = motion.word_forward,
-      [key.b] = motion.word_backward,
-      
-      [key.o] = function()
-        motion.cursor_line_end()
-        editing.insert_newline()
-      end,
-      
-      [":"] = bind(mode.safe_set_mode, "command"),
-      ["shift+:"] = bind(mode.safe_set_mode, "command"),
-      
-      [key.u] = pome.undo,
-      [key.shift.U] = pome.redo,
-
-      [key.p] = bind(register.paste_after),
+        [key.h] = motion.cursor_left,
+        [key.l] = motion.cursor_right,
+        [key.k] = motion.cursor_up,
+        [key.j] = motion.cursor_down,
+    
+        [key.d] = bind(mode.enter_minor_mode, "d_pending"),
+        [key.g] = bind(mode.enter_minor_mode, "g_pending"),
+        [key.shift.G] = motion.goto_lastline,
+        [key.i] = bind(mode.safe_set_mode, "insert"),
+        [key.v] = bind(mode.safe_set_mode, "visual"),
+        [key.w] = motion.word_forward,
+        [key.b] = motion.word_backward,
+        
+        [key.o] = bind(editing.openline, false),
+        [key.shift.O] = bind(editing.openline, true),
+        
+        [":"] = bind(mode.safe_set_mode, "command"),
+        ["shift+:"] = bind(mode.safe_set_mode, "command"),
+        
+        [key.u] = pome.undo,
+        [key.shift.U] = pome.redo,
+    
+        [key.p] = register.paste,
     },
 
     base
-  );
+);
 
   local sequences =
     {
@@ -53,4 +51,5 @@ local function make_normal_config()
   }
 end
 
+-- return the entire function for hot reload
 return make_normal_config

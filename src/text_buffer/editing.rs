@@ -2,6 +2,35 @@ use crate::data_types::{editor::Editor, history::Edit, misc::Position};
 
 impl Editor
 {
+    //use absolute position
+    pub fn delete_range(&mut self, (start, end): (usize, usize))
+    -> Option<String>
+    {
+        if start == end {return None;}
+        let cur_abs_pos = self.cur_info.abs_pos;
+
+        //nominate the range
+        let (start, end) = (start.min(end), start.max(end));
+
+        let removed = self.buffer.slice(start..end).to_string();
+        self.buffer.remove(start..end);
+        
+        if start < cur_abs_pos && end > cur_abs_pos
+        {
+            self.cur_info.abs_pos = start;
+        }
+        else if cur_abs_pos >= end
+        {
+            self.cur_info.abs_pos -= end - start;
+        }
+        
+        let record_edit = Edit::Delete { pos: start, text: removed.clone()};
+
+        self.history.record(record_edit, cur_abs_pos, start);
+
+        return Some(removed);
+    }
+    
     pub fn delete_selected(&mut self)
     -> Option<String>
     {

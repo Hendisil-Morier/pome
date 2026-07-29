@@ -14,6 +14,14 @@ pub struct Position
 	pub y: usize,
 }
 
+impl From<(usize, usize)> for Position
+{
+    fn from((x, y): (usize, usize)) -> Self
+    {
+        return Position{ x, y};
+    }
+}
+
 #[derive(Default, Clone)]
 pub struct CursorInfo
 {

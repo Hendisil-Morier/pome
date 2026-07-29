@@ -31,6 +31,7 @@ fn register_primitives(lua: &Lua, table: &mlua::Table) -> mlua::Result<()> {
         
         ("delete_after",            lua_delete_after),
         ("delete_before",           lua_delete_before),
+        ("delete_range",            lua_delete_range),
         
         ("set_anchor",              lua_set_anchor),
         ("clear_anchor",            lua_clear_anchor),
