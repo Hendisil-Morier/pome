@@ -87,8 +87,9 @@
 ---@field backward_match_notset fun(charset: table<string, boolean>, x?: integer, y?: integer): integer?, integer?
 --- 
 --- 
---- Returns the single character located at the given (x,y) position
----@field char_at fun(x: integer, y: integer): string?
+--- Returns the single character located at the given (x,y) position,
+--- default to cursor position
+---@field char_at fun(x?: integer, y?: integer): string?
 --- 
 --- 
 --- Blocks and waits for the next keystroke, returning its string representation

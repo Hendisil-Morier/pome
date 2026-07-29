@@ -57,6 +57,7 @@ function engine.statusline(buf_rect, bar_rect, cx, cy)
     pome.draw_panels({ text_buffer_panel, status_line_panel })
 end
 
+-- entry function
 function pome.main()
     while pome.is_running() do
         pcall(engine.render)

@@ -8,9 +8,7 @@ local identifier = charset.identifier
 local whitespace = charset.whitespace
 local non_word   = charset.non_word
 
--- =====================================================
--- Internal helpers (not exported directly)
--- =====================================================
+-- Internal helpers
 
 -- Move one character backward; returns nil if at start of file
 local function pos_prev(x, y)
@@ -55,9 +53,7 @@ local function move_cursor_to(x, y)
   pome.move_cursor_to(x, y)
 end
 
--- =====================================================
 -- Public movement functions
--- =====================================================
 
 local M = {}
 
@@ -102,9 +98,7 @@ function M.goto_lastline()
   move_cursor_to(state.prefer_x, pome.get_max_line_index())
 end
 
--- =====================================================
--- Word motions (character-class aware)
--- =====================================================
+-- Word motions
 
 function M.word_forward()
   local x, y = pome.get_cursor_pos()
