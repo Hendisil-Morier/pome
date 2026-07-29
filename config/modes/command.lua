@@ -21,10 +21,10 @@ local function make_command_config()
           pome.save_file()
           pome.quit_editor()
         end
-        pome.set_mode("normal")
+        engine.set_mode("normal")
       end,
       [key.esc] = function()
-        pome.set_mode("normal")
+        engine.set_mode("normal")
       end,
     },
     base

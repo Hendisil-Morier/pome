@@ -16,11 +16,11 @@ local function is_in_table(tbl, key)
     return false
 end
 
-function pome.call_keymap(key_str)
-    local cur = pome.mode_state.cur_mode
+function engine.call_keymap(key_str)
+    local cur = engine.mode_state.cur_mode
     if not cur then return false end
     
-    local mt = pome.get_mode_table(cur)
+    local mt = engine.get_mode_table(cur)
     if not mt or type(mt.keymap) ~= "table" then return false end
     
     local fn = mt.keymap[key_str]
@@ -30,20 +30,20 @@ function pome.call_keymap(key_str)
     return ok
 end
 
-function pome.call_default(ch)
-    local cur = pome.mode_state.cur_mode
+function engine.call_default(ch)
+    local cur = engine.mode_state.cur_mode
     if not cur then return false end
     
-    local mt = pome.get_mode_table(cur)
+    local mt = engine.get_mode_table(cur)
     if not mt or type(mt.default) ~= "function" then return false end
     
     local ok, _ = pcall(mt.default, ch)
     return ok
 end
 
-function pome.process_sequences(key_str)
+function engine.process_sequences(key_str)
     local key_seqs = (key_str == " ") and "space" or key_str
-    local state = pome.mode_state
+    local state = engine.mode_state
     local sequences = state.sequences
     
     if type(sequences) ~= "table" then
@@ -74,23 +74,23 @@ function pome.process_sequences(key_str)
     return false
 end
 
-function pome.dispatch_key(key_str)
-    local change_before = pome.mode_state.change_count
+function engine.dispatch_key(key_str)
+    local change_before = engine.mode_state.change_count
     
-    local handled = pome.process_sequences(key_str)
-    if not handled then handled = pome.call_keymap(key_str) end
-    if not handled then handled = pome.call_default(key_str) end
+    local handled = engine.process_sequences(key_str)
+    if not handled then handled = engine.call_keymap(key_str) end
+    if not handled then handled = engine.call_default(key_str) end
     
-    if change_before ~= pome.mode_state.change_count then return end
+    if change_before ~= engine.mode_state.change_count then return end
     
-    local cur_mode = pome.mode_state.cur_mode
+    local cur_mode = engine.mode_state.cur_mode
     if not cur_mode then return end
     
-    local cur_minor = pome.is_minor_mode(cur_mode)
-    local prev = pome.mode_state.prev_mode
-    local saved_major = prev and not pome.is_minor_mode(prev)
+    local cur_minor = engine.is_minor_mode(cur_mode)
+    local prev = engine.mode_state.prev_mode
+    local saved_major = prev and not engine.is_minor_mode(prev)
     
     if cur_minor and saved_major then
-        pome.restore_mode()
+        engine.restore_mode()
     end
 end

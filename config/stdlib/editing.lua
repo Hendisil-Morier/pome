@@ -10,19 +10,9 @@ local M = {}
 
 -- Delete the entire current line
 function M.delete_line()
-  -- Move to the beginning of the line first (this also updates prefer_x)
-  motion.cursor_line_start()
+    local _, y = pome.get_cursor_pos()
 
-  local _, y = pome.get_cursor_pos()
-
-  if y == pome.get_max_line_index() then
-    M.delete_to_line_end()
-    return
-  end
-  
-  pome.set_anchor(0, y + 1)
-  pome.delete_selected()
-  pome.clear_anchor()
+    pome.delete_range(0, y, pome.get_line_end(y) + 1, y)
 end
 
 -- Insert a newline at the cursor (splits the line)

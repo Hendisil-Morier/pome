@@ -1,11 +1,14 @@
 [package]
 name = "pome"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2024"
 
 description = "A terminal-based text editor built with Ratatui."
 license = "MIT OR Apache-2.0"
+
 readme = "README.md"
+repository = "https://github.com/Hendisil-Morier/pome"
+homepage = "https://github.com/Hendisil-Morier/pome"
 
 [dependencies]
 mlua = { version = "^0.11.6", features = ["lua55", "vendored", "serialize"] }
