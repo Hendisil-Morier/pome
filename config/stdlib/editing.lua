@@ -1,6 +1,7 @@
 -- stdlib/editing.lua
 -- Basic editing operations that combine cursor movement with Pome API calls
 local motion = require("stdlib.motion")
+local mode = require("stdlib.mode")
 
 -- We'll use motion.cursor_line_start, but we can also use other helpers if needed
 -- (like motion.move_cursor_to, motion.pos_next, etc.)
@@ -30,7 +31,7 @@ function M.insert_newline()
 end
 
 -- Simple character deletion (forward and backward)
--- You can either wrap the Pome API directly or add small safety checks.
+-- either wrap the Pome API directly or add small safety checks.
 function M.delete_before_cursor()
   pome.delete_before()
 end
@@ -39,12 +40,12 @@ function M.delete_after_cursor()
   pome.delete_after()
 end
 
--- Insert a character at the cursor (used by insert mode's default handler)
+-- Insert a character at the cursor
 function M.insert_char(ch)
   pome.insert_char(ch)
 end
 
--- Example of a more complex edit: delete to end of line
+-- delete to end of line
 function M.delete_to_line_end()
   local x, y = pome.get_cursor_pos()
   local line_end = pome.get_line_end(y)
@@ -59,10 +60,7 @@ function M.delete_to_line_end()
   pome.clear_anchor()
 end
 
--- Example: delete word forward (could combine motion and deletion)
--- (Not fully implemented, just a sketch)
--- function M.delete_word_forward()
---   -- set anchor, call word_forward to extend selection, then delete
--- end
+-- add newline and enter insert mode
+
 
 return M

@@ -6,42 +6,25 @@ local motion  = require("stdlib.motion")
 local editing = require("stdlib.editing")
 local mode    = require("stdlib.mode")
 local layout  = require("stdlib.layout")
+local state   = require("stdlib.state")
+local register = require("stdlib.register")
 
-return {
-  -- charset
-  make_charset   = charset.make_charset,
-  merge_sets     = charset.merge_sets,
-  whitespace     = charset.whitespace,
-  identifier     = charset.identifier,
-  non_word       = charset.non_word,
+-- when writing stuff inside this stdlib module, require("stdlib.[stuff]") directly
+-- doing otherwise may cause dependency loop
 
-  -- motion (cursor + word movements)
-  move_cursor_to   = motion.move_cursor_to,
-  cursor_up        = motion.cursor_up,
-  cursor_down      = motion.cursor_down,
-  cursor_left      = motion.cursor_left,
-  cursor_right     = motion.cursor_right,
-  cursor_line_start= motion.cursor_line_start,
-  cursor_line_end  = motion.cursor_line_end,
-  word_forward     = motion.word_forward,
-  word_backward    = motion.word_backward,
-  goto_firstline   = motion.goto_firstline,
-  goto_lastline    = motion.goto_lastline,
-  pos_prev         = motion.pos_prev,
-  pos_next         = motion.pos_next,
+return
+{
+    charset = charset,
 
-  -- mode management
-  safe_set_mode    = mode.safe_set_mode,
-  enter_minor_mode = mode.enter_minor_mode,
+    motion = motion,
+    
+    editing = editing,
+    
+    mode = mode,
+    
+    layout = layout,
   
-  --editing
-  delete_line          = editing.delete_line,
-  insert_newline       = editing.insert_newline,
-  delete_before_cursor = editing.delete_before_cursor,
-  delete_after_cursor  = editing.delete_after_cursor,
-  insert_char          = editing.insert_char,
-  delete_to_line_end   = editing.delete_to_line_end,  -- if you want it  
-
-  -- layout
-  layout = layout,
+    register = register,
+  
+    state = state,
 }

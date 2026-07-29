@@ -2,10 +2,12 @@
 local std = require("stdlib")
 local base = require("modes.base_keymap")
 
+local motion = std.motion
+
 local function make_g_pending_config()
   local keymap = inherit(
     {
-      [key.g] = bind(std.goto_firstline),   -- gg → top of file
+      [key.g] = bind(motion.goto_firstline),   -- gg → top of file
     },
     base
   )

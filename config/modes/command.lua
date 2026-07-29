@@ -1,4 +1,5 @@
 -- modes/command.lua
+-- super basic command mode
 local base = require("modes.base_keymap")
 
 local cmd_text = ""

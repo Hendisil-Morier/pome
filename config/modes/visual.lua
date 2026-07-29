@@ -2,21 +2,30 @@
 local std = require("stdlib")
 local base = require("modes.base_keymap")
 
+local motion = std.motion
+local register = std.register
+local mode = std.mode
+
 local function make_visual_config()
   local keymap = inherit(
     {
-      [key.h] = std.cursor_left,
-      [key.l] = std.cursor_right,
-      [key.k] = std.cursor_up,
-      [key.j] = std.cursor_down,
+      [key.h] = motion.cursor_left,
+      [key.l] = motion.cursor_right,
+      [key.k] = motion.cursor_up,
+      [key.j] = motion.cursor_down,
 
       [key.d] = function()
         pome.delete_selected()
         pome.clear_anchor()
-        std.safe_set_mode("normal")
+        mode.safe_set_mode("normal")
       end,
 
-      [key.v] = bind(std.safe_set_mode, "normal"),
+      [key.v] = bind(mode.safe_set_mode, "normal"),
+      
+      [key.y] = function()
+        register.yank()
+        mode.safe_set_mode("normal")
+        end,
     },
     base
   )
