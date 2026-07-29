@@ -1,0 +1,10 @@
+{
+    "diagnostics": {
+        "globals": [
+            "pome"
+        ]
+    },
+    "workspace": {
+        "library": []
+    }
+}

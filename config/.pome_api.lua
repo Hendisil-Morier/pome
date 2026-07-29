@@ -1,0 +1,161 @@
+---@meta
+-- This file provides type annotations for the Lua Language Server.
+-- It is not meant to be executed at runtime.
+
+---@class pomeAPI
+--- Moves the cursor relative to its current position by a specified amount
+---@field move_cursor fun(direction: string, amount: integer)
+--- 
+--- 
+--- Moves the cursor to an absolute (x, y) grid position
+---@field move_cursor_to fun(x: integer, y: integer)
+--- 
+--- 
+--- Exits the editor
+---@field quit_editor fun()
+--- 
+--- 
+--- Inserts a single character at the given (x,y) position or cursor location
+---@field insert_char fun(ch: string, x?: integer, y?: integer)
+--- 
+--- 
+--- Inserts a string of text at the given (x,y) position or cursor location
+---@field insert_string fun(str: string, x?: integer, y?: integer)
+--- 
+--- 
+--- Deletes the character immediately after the cursor
+---@field delete_after fun()
+--- 
+--- 
+--- Deletes the character immediately before the cursor (backspace)
+---@field delete_before fun()
+--- 
+--- 
+--- Deletes all text between two (x,y) grid coordinates and returns the removed text
+---@field delete_range fun(x1: integer, y1: integer, x2: integer, y2: integer): string?
+--- 
+--- 
+--- Sets the visual selection anchor at the given (x,y) position or cursor location
+---@field set_anchor fun(x?: integer, y?: integer)
+--- 
+--- 
+--- Clears the current visual selection anchor
+---@field clear_anchor fun()
+--- 
+--- 
+--- Deletes the currently selected text and returns it
+---@field delete_selected fun(): string?
+--- 
+--- 
+--- Returns the text currently highlighted by the visual selection
+---@field get_selected fun(): string?
+--- 
+--- 
+--- Saves the current buffer to disk
+---@field save_file fun()
+--- 
+---
+--- Returns the length (x-coordinate) of the specified line
+---@field get_line_end fun(line_index: integer): integer
+--- 
+--- 
+--- Returns the current (x, y) position of the cursor
+---@field get_cursor_pos fun(): integer, integer
+--- 
+--- 
+--- Scans forward for a specific character, returning its (x, y) coordinates
+---@field forward_match fun(char: string, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Scans backward for a specific character, returning its (x, y) coordinates
+---@field backward_match fun(char: string, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Scans forward for the first character that EXISTS in the given charset
+---@field forward_match_set fun(charset: table<string, boolean>, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Scans forward for the first character that DOES NOT EXIST in the given charset
+---@field forward_match_notset fun(charset: table<string, boolean>, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Scans backward for the first character that EXISTS in the given charset
+---@field backward_match_set fun(charset: table<string, boolean>, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Scans backward for the first character that DOES NOT EXIST in the given charset
+---@field backward_match_notset fun(charset: table<string, boolean>, x?: integer, y?: integer): integer?, integer?
+--- 
+--- 
+--- Returns the single character located at the given (x,y) position
+---@field char_at fun(x: integer, y: integer): string?
+--- 
+--- 
+--- Blocks and waits for the next keystroke, returning its string representation
+---@field next_key fun(): string?
+--- 
+--- 
+--- Returns true if the editor is currently running
+---@field is_running fun(): boolean
+--- 
+--- 
+--- Returns the index of the last line in the buffer
+---@field get_max_line_index fun(): integer
+--- 
+--- 
+--- Sets the directory used for loading Lua configurations
+---@field set_config_dir fun(dir: string)
+--- 
+--- 
+--- Returns the directory used for loading Lua configurations
+---@field get_config_dir fun(): string
+--- 
+--- 
+--- Sets the filename of the current buffer
+---@field set_filename fun(name: string)
+--- 
+--- 
+--- Returns the filename of the current buffer
+---@field get_filename fun(): string?
+--- 
+--- 
+--- Reverts the last edit operation
+---@field undo fun()
+--- 
+--- 
+--- Re-applies the last reverted edit operation
+---@field redo fun()
+--- 
+--- 
+--- Starts batching edits into a single undo step
+---@field begin_undo_group fun()
+--- 
+--- 
+--- Finishes batching edits into a single undo step
+---@field end_undo_group fun()
+--- 
+--- 
+--- Returns true if there are changes available to undo
+---@field can_undo fun(): boolean
+--- 
+--- 
+--- Returns true if there are changes available to redo
+---@field can_redo fun(): boolean
+--- 
+--- 
+--- Sets the idle timeout (in ms) before edits are automatically grouped in the undo history
+---@field set_undo_timeout fun(timeout: number)
+--- 
+--- 
+--- Sets the visual shape of the terminal cursor (e.g. 'block', 'bar_blink')
+---@field set_cursor_shape fun(shape: string)
+--- 
+--- 
+--- Returns the (width, height) dimensions of the terminal window
+---@field get_term_size fun(): integer, integer
+--- 
+--- 
+--- Pushes an array of panels to be rendered to the terminal screen
+---@field draw_panels fun(panels: table[])
+--- 
+pome = {}

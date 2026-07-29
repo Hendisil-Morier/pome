@@ -11,8 +11,20 @@ local M = {}
 -- Delete the entire current line
 function M.delete_line()
     local _, y = pome.get_cursor_pos()
+    local max = pome.get_max_line_index()
+    local target_y
+    local target_x
+    
+    if y == max then
+        -- last line, just delete the entire thing
+        target_x = pome.get_line_end(y)
+        target_y = y
+    else
+        target_x = 0
+        target_y = y+1
+    end
 
-    pome.delete_range(0, y, pome.get_line_end(y) + 1, y)
+    pome.delete_range(0, y, target_x, target_y)
 end
 
 -- Insert a newline at the cursor (splits the line)
