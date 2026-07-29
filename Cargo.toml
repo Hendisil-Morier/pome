@@ -3,8 +3,12 @@ name = "pome"
 version = "0.0.5"
 edition = "2024"
 
+description = "A terminal-based text editor built with Ratatui. All editing logic is written in Lua, allowing you to freely redefine what a 'mode' means and how the editor behaves."
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+
 [dependencies]
-ratatui = "^0.30.2"
-crossterm = "^0.29.0"
-mlua = { version = "^0.11.6", features = ["lua55", "vendored"] }
+mlua = { version = "^0.11.6", features = ["lua55", "vendored", "serialize"] }
+ratatui = {version = "^0.30.2", features = ["serde"]}
 ropey = "^1.6.1"
+serde = {version = "^1.0.228", features = ["derive"]}

@@ -1,43 +1,20 @@
 -- engine.lua
 
-pome.modes = {}
-pome.mode_state = {
-    cur_mode    = nil,
-    prev_mode   = nil,
-    pending_seq = "",
-    change_count = 0,
-}
+require("core.modes")
+require("core.keys")
 
-function pome.get_current_mode()
-    return pome.mode_state.cur_mode
-end
+local layout = require("stdlib.layout")
 
-local function get_mode_table(mode_name)
-    local t = pome.modes[mode_name]
-    return type(t) == "table" and t or nil
-end
+local row_offset = 0
 
-local function is_in_table(tbl, key)
-    for k, _ in pairs(tbl) do
-        if type(k) == "string" and #k > #key then
-            if k:sub(1, #key) == key and k:sub(#key+1, #key+1) == " " then
-                return true
-            end
-        end
-    end
-    return false
-end
+function pome.render()
+    local w, h = pome.get_term_size()
+    local screen = { x=0, y=0, width=w, height=h }
+    
+    local buf_rect, bar_rect = layout.hsplit(screen, h - 1)
 
-function pome.set_mode(mode_name)
-    local old = pome.mode_state.cur_mode
-    if old then pome.call_mode_hook(old, "on_exit") end
-    pome.mode_state.cur_mode = mode_name
-    pome.mode_state.change_count = pome.mode_state.change_count + 1
-    pome.mode_state.pending_seq = ""
-    local mode_table = get_mode_table(mode_name)
-    pome.mode_state.sequences = mode_table and mode_table.sequences or nil
-    pome.call_mode_hook(mode_name, "on_enter")
-end
+    local cx, cy = pome.get_cursor_pos()
+    row_offset = layout.compute_scroll(row_offset, cy, buf_rect.height)
 
 function pome.save_mode(mode_name)
     pome.mode_state.prev_mode = mode_name
@@ -135,28 +112,64 @@ end
 function pome.statusline()
     local mode = pome.mode_state.cur_mode or "?"
     local fname = pome.get_filename() or "[No Name]"
-    local x, y = pome.get_cursor_pos()
-    local ln, col = (y or 0) + 1, (x or 0) + 1
-    return string.format(" %s | %s | Ln %d, Col %d ", mode, fname, ln, col)
+    local mode  = pome.mode_state.cur_mode or "?"
+    local status = string.format(" %s | %s | Ln %d, Col %d ", mode, fname, cy+1, cx+1)
+
+    local text_buffer_panel = {
+        type = "buffer",
+        rect = buf_rect,
+        row_offset = row_offset,
+        tab_width = 4,
+    }
+
+    local status_line_panel
+    if pome.mode_state.cur_mode == "command" then
+        local cmd_config = pome.modes["command"]
+        local text = cmd_config.get_text and cmd_config.get_text() or ""
+        
+        status_line_panel = {
+            type = "text",
+            rect = bar_rect,
+            content = ":" .. text,
+            bg = "DarkGray",
+            fg = "White",
+            cursor = { #text + 1, 0 },
+        }
+    else
+        status_line_panel = {
+            type = "text",
+            rect = bar_rect,
+            content = status,
+            bg = "DarkGray",
+            fg = "White",
+        }
+    end
+
+    pome.draw_panels({ text_buffer_panel, status_line_panel })
 end
 
-function pome.main() --main entry from the core
-  pome.update_scroll()
-  pome.render()
-  while pome.is_running() do
-      local ok, err = pcall(function()
-          local key = pome.next_key()
-          if key then
-              pome.dispatch_key(key)
-          end
-          pome.update_scroll()
-          pome.render()
-      end)
-      if not ok then
-          pome.statusline = function() return "ERROR: " .. tostring(err) end
-          pome.render()
-          pome.next_key()
-          pome.statusline = nil
-      end
-  end
+function pome.main()
+    while pome.is_running() do
+        pcall(pome.render)
+
+        local ok, err = pcall(function()
+            local key = pome.next_key()
+            if key then
+                pome.dispatch_key(key)
+            end
+        end)
+        
+        if not ok then
+            local w, h = pome.get_term_size()
+            local error_report_panel = {
+                type = "text",
+                rect = { x=0, y=h-1, width=w, height=1 },
+                content = "ERROR: " .. tostring(err),
+                bg = "Red",
+                fg = "White",
+            }
+            pome.draw_panels({ error_report_panel })
+            pome.next_key()
+        end
+    end
 end
