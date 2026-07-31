@@ -40,7 +40,7 @@ local keymap = inherit(
 
   local sequences =
     {
-      ["space e r"] = bind(dofile, "config/init.lua"),
+      ["space e r"] = bind(dofile, "runtime/init.lua"),
       ["space q q"] = pome.quit_editor,
     }
     

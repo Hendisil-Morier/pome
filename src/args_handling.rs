@@ -35,7 +35,7 @@ pub fn parse_arguments(args: Vec<String>) -> Result<ParsedArgs, String>
     let config_file = match config_path
     {
         Some(p) => PathBuf::from(p),
-        None    => PathBuf::from("config/init.lua"),
+        None    => PathBuf::from("runtime/init.lua"),
     };
 
     let config_file = std::fs::canonicalize(&config_file)
