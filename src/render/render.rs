@@ -38,10 +38,10 @@ pub fn render_text(
         style = style.fg(to_ratatui_color(c));
     }
 
-    // 1. Clear the area completely so buffer text doesn't show through
+    // Clear the area completely so buffer text doesn't show through
     frame.render_widget(ratatui::widgets::Clear, rect);
 
-    // 2. Wrap it in a Block with the style so the entire area gets the background color
+    // Wrap it in a Block with the style so the entire area gets the background color
     let p = Paragraph::new(content)
         .style(style)
         .block(ratatui::widgets::Block::default().style(style));

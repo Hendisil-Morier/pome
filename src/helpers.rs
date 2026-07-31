@@ -71,7 +71,9 @@ pub fn keyevent_to_string(code: KeyCode, modifiers: KeyModifiers) -> Option<Stri
     }
     if modifiers.contains(KeyModifiers::SHIFT)
     {
-        result.push_str("shift+");
+        if !matches!(code, KeyCode::Char(_)) {
+            result.push_str("shift+");
+        }
     }
 
     match code

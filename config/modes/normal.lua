@@ -17,20 +17,19 @@ local keymap = inherit(
     
         [key.d] = bind(mode.enter_minor_mode, "d_pending"),
         [key.g] = bind(mode.enter_minor_mode, "g_pending"),
-        [key.shift.G] = motion.goto_lastline,
+        [key.G] = motion.goto_lastline,
         [key.i] = bind(mode.safe_set_mode, "insert"),
         [key.v] = bind(mode.safe_set_mode, "visual"),
         [key.w] = motion.word_forward,
         [key.b] = motion.word_backward,
         
         [key.o] = bind(editing.openline, false),
-        [key.shift.O] = bind(editing.openline, true),
+        [key.O] = bind(editing.openline, true),
         
         [":"] = bind(mode.safe_set_mode, "command"),
-        ["shift+:"] = bind(mode.safe_set_mode, "command"),
         
         [key.u] = pome.undo,
-        [key.shift.U] = pome.redo,
+        [key.U] = pome.redo,
     
         [key.p] = register.paste,
     },

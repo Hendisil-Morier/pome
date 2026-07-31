@@ -40,6 +40,7 @@ impl Editor
 		let cur_info = CursorInfo{
 			abs_pos: 0,
 			anchor: None,
+			selection_mode: None,
 			selecting: false,
 		};
 
@@ -47,8 +48,6 @@ impl Editor
 			filename,
 			config_dir,
 			buffer,
-			// dim,
-			// mode_info,
 			cur_info,
 			running,
 			history: History::new(),

@@ -1,5 +1,5 @@
 use mlua::Lua;
-use crate::data_types::misc::Position;
+use crate::data_types::misc::{Position, SelectionMode};
 use crate::helpers::{*};
 use crate::{get_editor, validate_usize};
 
@@ -47,12 +47,16 @@ pub fn lua_insert_string(lua: &Lua,
     return Ok(());
 }
 
-pub fn lua_set_anchor(lua: &Lua, (x, y): (Option<i64>, Option<i64>))
+pub fn lua_set_anchor(lua: &Lua,
+    (mode, x, y): (Option<String>, Option<i64>, Option<i64>))
 -> mlua::Result<()>
 {
     get_editor!(mut editor from lua);
 
     let cur_pos = editor.cursor_pos();
+    let sel_mode: SelectionMode;
+    let mode = mode.unwrap_or_else( || "char".to_string() );
+    
     let anchor_x = x.unwrap_or(cur_pos.x as i64);
     let anchor_y = y.unwrap_or(cur_pos.y as i64);
 
@@ -61,11 +65,17 @@ pub fn lua_set_anchor(lua: &Lua, (x, y): (Option<i64>, Option<i64>))
         lua.warning("set_anchor: negative cordinate, ignoring", false);
         return Ok(());
     }
+    
+    match mode.to_lowercase().as_str()
+    {
+        "line" => sel_mode = SelectionMode::Line,
+        _ => sel_mode = SelectionMode::Char,
+    }
 
     let anchor_pos = Position{x: anchor_x as usize, y : anchor_y as usize};
 
     let abs_pos = editor.repos_to_abspos(anchor_pos);
-    editor.set_anchor(abs_pos);
+    editor.set_anchor(abs_pos, sel_mode);
 
     return Ok(());
 }

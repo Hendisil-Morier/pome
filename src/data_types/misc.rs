@@ -27,5 +27,13 @@ pub struct CursorInfo
 {
 	pub abs_pos: usize,
 	pub anchor: Option<usize>,
+	pub selection_mode: Option<SelectionMode>,
 	pub selecting: bool,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum SelectionMode
+{
+    Char,
+    Line
 }

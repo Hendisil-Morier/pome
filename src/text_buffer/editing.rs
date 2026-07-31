@@ -1,4 +1,4 @@
-use crate::data_types::{editor::Editor, history::Edit, misc::Position};
+use crate::data_types::{editor::Editor, history::Edit, misc::{Position, SelectionMode}};
 
 impl Editor
 {
@@ -37,63 +37,94 @@ impl Editor
         if self.cur_info.selecting == false
         {return None;}
 
-        let anchor;
-        if let Some(a) = self.cur_info.anchor
-        {anchor = a;}
-        else {return None;}
-
+        let anchor = self.cur_info.anchor?;
+        let sel_mode = self.cur_info.selection_mode?;
+        
         let cur_abs_pos = self.cur_info.abs_pos;
+        let max_line = self.max_index_lines();
 
-        let start = anchor.min(cur_abs_pos);
-        let end = anchor.max(cur_abs_pos);
+        let mut start = anchor.min(cur_abs_pos);
+        let mut end = anchor.max(cur_abs_pos);
 
         if start == end {return None;}
-
-        let removed = self.buffer.slice(start..end).to_string();
+        
+        if sel_mode == SelectionMode::Line
+        {
+            let line_start_idx = self.buffer.char_to_line(start);
+            let line_end_idx= self.buffer.char_to_line(end);
+            
+            start = self.line_start(line_start_idx);
+            
+            if line_end_idx == max_line
+            {end = self.buffer.len_chars();}
+            else
+            {end = self.line_start(line_end_idx +1);}
+        }
+        
+        let removed= self.buffer
+            .slice(start..end)
+            .to_string();
+        
         self.buffer.remove(start..end);
         //update cursor pos
         self.cur_info.abs_pos = start;
-
+                
         let record_edit = Edit::Delete { pos: start, text: removed.clone()};
 
         self.history.record(record_edit, cur_abs_pos, start);
 
         return Some(removed);
     }
-
+    
     pub fn get_selected(&self)
     -> Option<String>
     {
         if !self.cur_info.selecting
         {return None;}
 
-        let anchor = match self.cur_info.anchor
-        {
-            Some(a) => a,
-            None => return None,
-        };
+        let anchor = self.cur_info.anchor?;
+        let sel_mode = self.cur_info.selection_mode?;
+        
+        let cur_abs_pos = self.cur_info.abs_pos;
+        let max_line = self.max_index_lines();
 
-        let cur_abspos = self.cur_info.abs_pos;
-
-        let start = anchor.min(cur_abspos);
-        let end = anchor.max(cur_abspos);
+        let mut start = anchor.min(cur_abs_pos);
+        let mut end = anchor.max(cur_abs_pos);
 
         if start == end {return None;}
+        
+        if sel_mode == SelectionMode::Line
+        {
+            let line_start_idx = self.buffer.char_to_line(start);
+            let line_end_idx= self.buffer.char_to_line(end);
+            
+            start = self.line_start(line_start_idx);
+            
+            if line_end_idx == max_line
+            {end = self.buffer.len_chars();}
+            else
+            {end = self.line_start(line_end_idx +1);}
+        }
 
-        let selected_str = self.buffer.slice(start..end).to_string();
+        let selected_str = self.buffer.
+            slice(start..end)
+            .to_string();
 
         return Some(selected_str);
     }
 
-    pub fn set_anchor(&mut self, abs_pos: usize)
+    pub fn set_anchor(&mut self, abs_pos: usize, mode: SelectionMode)
     {
         self.cur_info.anchor = Some(abs_pos);
+        self.cur_info.selection_mode = Some(mode);
         self.cur_info.selecting = true;
     }
 
     pub fn clear_anchor(&mut self)
     {
         self.cur_info.selecting = false;
+        self.cur_info.selection_mode = None;
+        self.cur_info.anchor = None;
     }
 
     pub fn insert_char_at(&mut self, ch: char, pos: Position)
