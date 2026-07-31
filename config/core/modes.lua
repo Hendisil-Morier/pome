@@ -19,7 +19,7 @@ function engine.get_mode_table(mode_name)
     return nil
 end
 
-function engine.set_mode(mode_name)
+function engine.set_mode(mode_name, ...)
     local old = engine.mode_state.cur_mode
     if old then engine.call_mode_hook(old, "on_exit") end
     
@@ -30,7 +30,7 @@ function engine.set_mode(mode_name)
     local mode_table = engine.get_mode_table(mode_name)
     engine.mode_state.sequences = mode_table and mode_table.sequences or nil
     
-    engine.call_mode_hook(mode_name, "on_enter")
+    engine.call_mode_hook(mode_name, "on_enter", ...)
 end
 
 function engine.save_mode(mode_name)
@@ -50,12 +50,12 @@ function engine.is_minor_mode(mode_name)
     return mt and not not mt.minor
 end
 
-function engine.call_mode_hook(mode_name, hook_name)
+function engine.call_mode_hook(mode_name, hook_name, ...)
     local mt = engine.get_mode_table(mode_name)
     if not mt then return end
     
     local fn = mt[hook_name]
     if type(fn) ~= "function" then return end
     
-    pcall(fn)
+    pcall(fn, ...)
 end

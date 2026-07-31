@@ -31,7 +31,9 @@ local function make_visual_config()
   )
 
   return {
-    on_enter = pome.set_anchor,
+    on_enter = function(sel_mode)
+        pome.set_anchor(sel_mode)
+    end,
     on_exit  = pome.clear_anchor,
     keymap   = keymap,
   }

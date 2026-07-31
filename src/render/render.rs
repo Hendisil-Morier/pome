@@ -74,7 +74,7 @@ pub fn render_panels(frame: &mut Frame, panels: &[Panel], rope: &Rope) {
                     rect: *rect,
                     row_offset: *row_offset,
                     tab_width: *tab_width,
-                    selection: selection_bound(cursor.as_ref()),
+                    selection: selection_bound(cursor.as_ref(), rope),
                     rope,
                 };
 

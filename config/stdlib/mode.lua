@@ -5,12 +5,12 @@ local M = {}
 
 -- Switch to a mode only if we're not already in it.
 -- Hooks are now handled by engine.set_mode itself.
-function M.safe_set_mode(name)
+function M.safe_set_mode(name, ...)
     local cur_mode = engine.get_current_mode()
     if name == cur_mode then
         return
     end
-    engine.set_mode(name)
+    engine.set_mode(name, ...)
 end
 
 -- Enter a minor (pending) mode: saves the current mode if it's not already a minor mode,

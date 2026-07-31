@@ -15,7 +15,7 @@ impl Editor
       idx += 1;
     }
     
-    None
+    return None;
   }
   
   pub fn backward_match(&self, from_abs: usize, matcher: char)
@@ -36,6 +36,6 @@ impl Editor
       {return Some(idx);}
     }
     
-    None
+    return None;
   }
 }

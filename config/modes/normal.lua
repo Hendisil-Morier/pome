@@ -20,6 +20,7 @@ local keymap = inherit(
         [key.G] = motion.goto_lastline,
         [key.i] = bind(mode.safe_set_mode, "insert"),
         [key.v] = bind(mode.safe_set_mode, "visual"),
+        [key.V] = bind(mode.safe_set_mode, "visual", "line"),
         [key.w] = motion.word_forward,
         [key.b] = motion.word_backward,
         

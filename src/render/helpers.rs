@@ -9,7 +9,7 @@ use ratatui::{
 };
 use ropey::Rope;
 
-use crate::{data_types::{misc::CursorInfo, render::PanelColor}, render::structs::DrawContext};
+use crate::{data_types::{misc::{CursorInfo, SelectionMode}, render::PanelColor}, render::structs::DrawContext};
 
 //helpers
 pub(crate) fn visible_range(rope: &Rope, row_offset: usize, height: usize)
@@ -128,17 +128,42 @@ pub(crate) fn to_ratatui_color(c: &PanelColor)
   return result;
 }
 
-pub(crate) fn selection_bound(cursor: Option<&CursorInfo>)
+pub(crate) fn selection_bound(cursor: Option<&CursorInfo>, rope: &Rope)
 -> Option<(usize, usize)>
 {
-  let c = cursor?;
-  
-  if !c.selecting {return None;}
-  
-  let anchor = c.anchor?;
-  let result = ( anchor.min(c.abs_pos), anchor.max(c.abs_pos) );
-  
-  return Some(result);
+    let c = cursor?;
+    
+    if !c.selecting {return None;}
+    
+    let sel_mode = c.selection_mode?;
+    let max_line = rope.len_lines().saturating_sub(1);
+    
+    let anchor = c.anchor?;
+    let mut start = anchor.min(c.abs_pos);
+    let mut end = anchor.max(c.abs_pos);
+    
+    if sel_mode == SelectionMode::Line
+    {
+        let line_start_idx = rope.char_to_line(start);
+        let line_end_idx= rope.char_to_line(end);
+
+        start = rope.line_to_char(line_start_idx);
+
+        if line_end_idx == max_line
+        {
+            end = rope.len_chars()
+            .saturating_sub(1);
+        }
+        else
+        {
+            end = rope.line_to_char(line_end_idx + 1)
+            .saturating_sub(1);
+        }
+    }
+    
+    let result = (start, end);
+    
+    return Some(result);
 }
 
 fn visual_x(

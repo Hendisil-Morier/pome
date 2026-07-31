@@ -34,12 +34,10 @@ impl Editor
   //return abs pos of the start of a given line
   pub fn line_start(&self, target_line: usize) -> usize
   {
-      let target_line = self.max_index_lines()
-                                    .min(target_line);
-      let line_repos = (0, target_line).into();
-      let line_start = self.repos_to_abspos(line_repos);
-      
-      return line_start;
+    let target_line = self.max_index_lines()
+        .min(target_line);
+    
+    return self.buffer.line_to_char(target_line);
   }
   
   pub fn repos_to_abspos(&self, pos: Position) -> usize

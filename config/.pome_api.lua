@@ -36,7 +36,7 @@
 --- 
 --- 
 --- Sets the visual selection anchor at the given (x,y) position or cursor location
----@field set_anchor fun(x?: integer, y?: integer)
+---@field set_anchor fun(mode?: string, x?: integer, y?: integer)
 --- 
 --- 
 --- Clears the current visual selection anchor
