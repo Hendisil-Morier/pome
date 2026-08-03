@@ -65,20 +65,21 @@ pub fn keyevent_to_string(code: KeyCode, modifiers: KeyModifiers) -> Option<Stri
     {
         result.push_str("alt+");
     }
+    
     if modifiers.contains(KeyModifiers::CONTROL)
     {
         result.push_str("ctrl+");
     }
+    
     if modifiers.contains(KeyModifiers::SHIFT)
+    && !matches!(code, KeyCode::Char(_))
     {
-        if !matches!(code, KeyCode::Char(_)) {
-            result.push_str("shift+");
-        }
+        result.push_str("shift+");
     }
 
     match code
     {
-        KeyCode::Char(c)   => result.push_str(&c.to_string()),
+        KeyCode::Char(c)   => result.push(c),
         KeyCode::Left      => result.push_str("arrow_left"),
         KeyCode::Right     => result.push_str("arrow_right"),
         KeyCode::Up        => result.push_str("arrow_up"),

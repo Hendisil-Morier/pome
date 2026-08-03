@@ -2,21 +2,19 @@ use crate::data_types::editor::Editor;
 
 impl Editor
 {
-  pub fn forward_match(&self, from_abs: usize, matcher: char)
-  -> Option<usize>
-  {
-    let mut idx = from_abs;
-    
-    for ch in self.buffer.chars_at(from_abs)
+    pub fn forward_match(&self, from_abs: usize, matcher: char)
+    -> Option<usize>
     {
-      if matcher == ch 
-      {return Some(idx);}
-      
-      idx += 1;
+        for (idx, ch) in self.buffer
+            .chars_at(from_abs)
+            .enumerate()
+        {
+            if matcher == ch 
+            {return Some(from_abs + idx);}
+        }
+        
+        return None;
     }
-    
-    return None;
-  }
   
   pub fn backward_match(&self, from_abs: usize, matcher: char)
   -> Option<usize>

@@ -34,7 +34,7 @@ impl Editor
     pub fn delete_selected(&mut self)
     -> Option<String>
     {
-        if self.cur_info.selecting == false
+        if !self.cur_info.selecting
         {return None;}
 
         let anchor = self.cur_info.anchor?;
@@ -188,7 +188,7 @@ pub fn delete_before(&mut self)
     let removed = self.buffer.char(cur_before - 1).to_string();
 
     self.buffer.remove(cursor.abs_pos - 1 .. cursor.abs_pos);
-    cursor.abs_pos = cursor.abs_pos - 1;
+    cursor.abs_pos -= 1;
 
     let record_edit = Edit::Delete { pos: cur_before - 1, text: removed};
     self.history.record(record_edit, cur_before, cursor.abs_pos);

@@ -120,13 +120,12 @@ fn match_set_impl(lua: &Lua,
     let mut i = from_abs;
     loop
     {
-        let cond;
-        if forward
-        {cond = i >= logic_len;}
+        let cond = if forward
+        {i >= logic_len}
         else
-        {cond = i == usize::MAX;}
+        {i == usize::MAX};
 
-        if cond  {break;}
+        if cond {break;}
 
         let c;
         if let Some(t) = editor.buffer.get_char(i)

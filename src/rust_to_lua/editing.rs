@@ -54,7 +54,6 @@ pub fn lua_set_anchor(lua: &Lua,
     get_editor!(mut editor from lua);
 
     let cur_pos = editor.cursor_pos();
-    let sel_mode: SelectionMode;
     let mode = mode.unwrap_or_else( || "char".to_string() );
     
     let anchor_x = x.unwrap_or(cur_pos.x as i64);
@@ -66,11 +65,11 @@ pub fn lua_set_anchor(lua: &Lua,
         return Ok(());
     }
     
-    match mode.to_lowercase().as_str()
+    let sel_mode = match mode.to_lowercase().as_str()
     {
-        "line" => sel_mode = SelectionMode::Line,
-        _ => sel_mode = SelectionMode::Char,
-    }
+        "line" => SelectionMode::Line,
+        _ => SelectionMode::Char,
+    };
 
     let anchor_pos = Position{x: anchor_x as usize, y : anchor_y as usize};
 

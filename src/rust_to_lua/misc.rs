@@ -58,7 +58,7 @@ pub fn lua_next_key(_: &Lua, _: ()) -> mlua::Result<Option<String>>
 
     let poll = ratatui::crossterm::event::poll(timeout)?;
 
-    if poll == false {return Ok(None);}
+    if !poll {return Ok(None);}
 
     let event = ratatui::crossterm::event::read()?;
 
