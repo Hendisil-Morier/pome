@@ -3,7 +3,7 @@ use crate::helpers::{*};
 use crate::{get_editor, validate_usize};
 
 pub fn lua_forward_match(lua: &Lua,
-	(matcher, from_x, from_y): (char, Option<i64>, Option<i64>))
+    (matcher, from_x, from_y): (char, Option<i64>, Option<i64>))
 -> mlua::Result<mlua::MultiValue>
 {
     get_editor!(editor from lua);
@@ -46,7 +46,7 @@ pub fn lua_forward_match(lua: &Lua,
 }
 
 pub fn lua_backward_match(lua: &Lua,
-	(matcher, from_x, from_y): (char, Option<i64>, Option<i64>))
+    (matcher, from_x, from_y): (char, Option<i64>, Option<i64>))
 -> mlua::Result<mlua::MultiValue>
 {
     get_editor!(editor from lua);
@@ -121,9 +121,9 @@ fn match_set_impl(lua: &Lua,
     loop
     {
         let cond = if forward
-        {i >= logic_len}
-        else
-        {i == usize::MAX};
+            {i >= logic_len}
+            else
+            {i == usize::MAX};
 
         if cond {break;}
 
@@ -138,8 +138,8 @@ fn match_set_impl(lua: &Lua,
         {
             result_pos = editor.abspos_to_repos(i);
             let result = [
-            mlua::Value::Integer(result_pos.x as i64),
-            mlua::Value::Integer(result_pos.y as i64),
+                mlua::Value::Integer(result_pos.x as i64),
+                mlua::Value::Integer(result_pos.y as i64),
             ];
             return Ok(mlua::MultiValue::from_iter(result));
         }
@@ -178,7 +178,7 @@ pub fn lua_forward_match_notset(lua: &Lua,
 }
 
 pub fn lua_backward_match_notset(lua: &Lua,
-        (charset, from_x, from_y): (mlua::Table, Option<i64>, Option<i64>))
+    (charset, from_x, from_y): (mlua::Table, Option<i64>, Option<i64>))
 -> mlua::Result<mlua::MultiValue>
 {
     return match_set_impl(lua, (charset, from_x, from_y), false, false);

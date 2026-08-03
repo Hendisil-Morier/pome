@@ -4,7 +4,7 @@ use crate::helpers::{*};
 use crate::{get_editor, validate_usize};
 
 pub fn lua_insert_char(lua: &Lua,
-  (ch, x, y): (char, Option<i64>, Option<i64>)) 
+    (ch, x, y): (char, Option<i64>, Option<i64>)) 
 -> mlua::Result<()>
 {
     get_editor!(mut editor from lua);
@@ -26,7 +26,7 @@ pub fn lua_insert_char(lua: &Lua,
 }
 
 pub fn lua_insert_string(lua: &Lua,
-  (text, x, y): (String, Option<i64>, Option<i64>)) 
+    (text, x, y): (String, Option<i64>, Option<i64>)) 
 -> mlua::Result<()>
 {
     get_editor!(mut editor from lua);
@@ -66,10 +66,10 @@ pub fn lua_set_anchor(lua: &Lua,
     }
     
     let sel_mode = match mode.to_lowercase().as_str()
-    {
-        "line" => SelectionMode::Line,
-        _ => SelectionMode::Char,
-    };
+        {
+            "line" => SelectionMode::Line,
+            _ => SelectionMode::Char,
+        };
 
     let anchor_pos = Position{x: anchor_x as usize, y : anchor_y as usize};
 

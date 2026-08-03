@@ -1,17 +1,17 @@
 
 pub enum Direction
 {
-	Left,
-	Right,
-	Up,
-	Down,
+    Left,
+    Right,
+    Up,
+    Down,
 }
 
 #[derive(Default, Clone, Copy)]
 pub struct Position
 {
-	pub x: usize,
-	pub y: usize,
+    pub x: usize,
+    pub y: usize,
 }
 
 impl From<(usize, usize)> for Position
@@ -25,10 +25,10 @@ impl From<(usize, usize)> for Position
 #[derive(Default, Clone)]
 pub struct CursorInfo
 {
-	pub abs_pos: usize,
-	pub anchor: Option<usize>,
-	pub selection_mode: Option<SelectionMode>,
-	pub selecting: bool,
+    pub abs_pos: usize,
+    pub anchor: Option<usize>,
+    pub selection_mode: Option<SelectionMode>,
+    pub selecting: bool,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

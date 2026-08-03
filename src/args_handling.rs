@@ -33,10 +33,10 @@ pub fn parse_arguments(args: Vec<String>) -> Result<ParsedArgs, String>
     }
 
     let config_file = match config_path
-    {
-        Some(p) => PathBuf::from(p),
-        None    => PathBuf::from("runtime/init.lua"),
-    };
+        {
+            Some(p) => PathBuf::from(p),
+            None    => PathBuf::from("runtime/init.lua"),
+        };
 
     let config_file = std::fs::canonicalize(&config_file)
         .unwrap_or(config_file);
@@ -49,10 +49,10 @@ pub fn parse_arguments(args: Vec<String>) -> Result<ParsedArgs, String>
     let parent = config_file.parent();
     
     let config_dir = match parent
-    {
-        Some(p) if !p.as_os_str().is_empty() => p.to_path_buf(),
-        _ => PathBuf::from("."),
-    };
+        {
+            Some(p) if !p.as_os_str().is_empty() => p.to_path_buf(),
+            _ => PathBuf::from("."),
+        };
     
     return Ok(ParsedArgs { filename, config_file, config_dir });
 }

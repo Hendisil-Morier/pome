@@ -10,10 +10,10 @@ type SafeEditor = Rc<RefCell<Editor>>;
 pub fn get_editor_impl(lua: &Lua)
 -> mlua::Result<SafeEditor>
 {
-  let tmp = lua.app_data_ref::<SafeEditor>()
-    .ok_or(mlua::Error::runtime("no editor found in registry"))?;
-  
-  return Ok(tmp.clone());
+    let tmp = lua.app_data_ref::<SafeEditor>()
+        .ok_or(mlua::Error::runtime("no editor found in registry"))?;
+    
+    return Ok(tmp.clone());
 }
 
 type SafeTerminal = Rc<RefCell<DefaultTerminal>>;
@@ -21,40 +21,40 @@ type SafeTerminal = Rc<RefCell<DefaultTerminal>>;
 pub fn get_terminal_impl(lua: &Lua)
 -> mlua::Result<SafeTerminal>
 {
-  let tmp = lua.app_data_ref::<SafeTerminal>()
-    .ok_or(mlua::Error::runtime("no terminal found in registry"))?;
-  
-  return Ok(tmp.clone());
+    let tmp = lua.app_data_ref::<SafeTerminal>()
+        .ok_or(mlua::Error::runtime("no terminal found in registry"))?;
+    
+    return Ok(tmp.clone());
 }
 
 #[macro_export]
 macro_rules! get_editor
 {
-  ($name:ident from $lua:expr) =>
-  {
-    let __tmp = get_editor_impl($lua).unwrap();
-    let $name = __tmp.borrow();
-  };
-  (mut $name:ident from $lua:expr) =>
-  {
-    let __tmp = get_editor_impl($lua).unwrap();
-    let mut $name = __tmp.borrow_mut();
-  }
+    ($name:ident from $lua:expr) =>
+    {
+        let __tmp = get_editor_impl($lua).unwrap();
+        let $name = __tmp.borrow();
+    };
+    (mut $name:ident from $lua:expr) =>
+    {
+        let __tmp = get_editor_impl($lua).unwrap();
+        let mut $name = __tmp.borrow_mut();
+    }
 }
 
 #[macro_export]
 macro_rules! get_terminal
 {
-  ($name:ident from $lua:expr) =>
-  {
-    let __tmp = get_terminal_impl($lua).unwrap();
-    let $name = __tmp.borrow();
-  };
-  (mut $name:ident from $lua:expr) =>
-  {
-    let __tmp = get_terminal_impl($lua).unwrap();
-    let mut $name = __tmp.borrow_mut();
-  }
+    ($name:ident from $lua:expr) =>
+    {
+        let __tmp = get_terminal_impl($lua).unwrap();
+        let $name = __tmp.borrow();
+    };
+    (mut $name:ident from $lua:expr) =>
+    {
+        let __tmp = get_terminal_impl($lua).unwrap();
+        let mut $name = __tmp.borrow_mut();
+    }
 }
 
 pub fn keyevent_to_string(code: KeyCode, modifiers: KeyModifiers) -> Option<String>
@@ -96,12 +96,12 @@ pub fn keyevent_to_string(code: KeyCode, modifiers: KeyModifiers) -> Option<Stri
 
 pub fn direction_from_str(s: &str) -> mlua::Result<Direction>
 {
-	match s
-	{
-		"left" => Ok(Direction::Left),
-		"right" => Ok(Direction::Right),
-		"up" => Ok(Direction::Up),
-		"down" => Ok(Direction::Down),
-		_ => Err(mlua::Error::runtime(format!("unkown direction: {s}")))
-	}
+    match s
+    {
+        "left" => Ok(Direction::Left),
+        "right" => Ok(Direction::Right),
+        "up" => Ok(Direction::Up),
+        "down" => Ok(Direction::Down),
+        _ => Err(mlua::Error::runtime(format!("unkown direction: {s}")))
+    }
 }

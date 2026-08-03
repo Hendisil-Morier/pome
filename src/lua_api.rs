@@ -3,21 +3,21 @@ use mlua::Lua;
 
 pub fn init_lua(lua: &Lua) -> mlua::Result<()>
 {
-	let pome = lua.create_table()?;
-	register_primitives(lua, &pome)?;
-	
-	lua.globals().set("pome", pome)?;
-	
-	return Ok(());
+    let pome = lua.create_table()?;
+    register_primitives(lua, &pome)?;
+    
+    lua.globals().set("pome", pome)?;
+    
+    return Ok(());
 }
 
 macro_rules! register_primitives {
-	($lua:expr, $table:expr, [$(($name:expr, $func:expr)),* $(,)?])
-	=> {
-		$(
-			$table.set($name, $lua.create_function($func)?)?;
-		)*
-	}
+    ($lua:expr, $table:expr, [$(($name:expr, $func:expr)),* $(,)?])
+    => {
+        $(
+            $table.set($name, $lua.create_function($func)?)?;
+        )*
+    }
 }
 
 fn register_primitives(lua: &Lua, table: &mlua::Table) -> mlua::Result<()> {

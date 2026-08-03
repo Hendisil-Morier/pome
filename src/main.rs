@@ -20,14 +20,14 @@ fn main() -> io::Result<()>
     let args: Vec<String> = std::env::args().collect();
 
     let parsed = match parse_arguments(args)
-    {
-        Ok(p)    => p,
-        Err(msg) =>
         {
-            eprintln!("error: {}", msg);
-            std::process::exit(1);
-        }
-    };
+            Ok(p)    => p,
+            Err(msg) =>
+            {
+                eprintln!("error: {}", msg);
+                std::process::exit(1);
+            }
+        };
 
     let editor = Editor::new(
         parsed.filename,
@@ -75,6 +75,6 @@ fn main() -> io::Result<()>
     
     if let Err(e) = result
     { eprintln!("fatal error in pome.main: {e}"); std::process::exit(1);}
-      
+    
     return Ok(());
 }
