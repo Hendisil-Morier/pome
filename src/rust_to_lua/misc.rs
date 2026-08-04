@@ -7,7 +7,7 @@ use mlua::{Lua, LuaSerdeExt};
 use crate::data_types::misc::Position;
 use crate::data_types::render::Panel;
 use crate::helpers::{*};
-use crate::render::render::render_panels;
+use crate::rendering::render::render_panels;
 use crate::{get_editor, get_terminal};
 
 pub fn lua_get_line_end(lua: &Lua, lline: Option<i64>)

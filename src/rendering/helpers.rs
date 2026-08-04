@@ -9,7 +9,7 @@ use ratatui::{
 };
 use ropey::Rope;
 
-use crate::{data_types::{misc::{CursorInfo, SelectionMode}, render::PanelColor}, render::structs::DrawContext};
+use crate::{data_types::{misc::{CursorInfo, SelectionMode}, render::PanelColor}, rendering::structs::DrawContext};
 
 //helpers
 pub(crate) fn visible_range(rope: &Rope, row_offset: usize, height: usize)

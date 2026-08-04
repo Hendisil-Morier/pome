@@ -11,7 +11,7 @@ use crate::{
         misc::CursorInfo,
         render::{Panel, PanelColor},
     },
-    render::{
+    rendering::{
         helpers::{
             draw_chars,
             place_cursor,

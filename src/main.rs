@@ -5,10 +5,11 @@ mod lua_api;
 mod rust_to_lua;
 mod file_handling;
 mod args_handling;
-mod render;
+mod rendering;
 mod data_types;
 mod history;
 mod helpers;
+mod embedded;
 
 use data_types::editor::Editor;
 use lua_api::init_lua;
